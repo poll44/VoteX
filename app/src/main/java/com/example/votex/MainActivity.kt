@@ -20,10 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VoteXTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Test()
                 }
             }
         }
@@ -31,10 +28,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Test() {
     Text(
-        text = "Hello $name!",
-        modifier = modifier
+        text = "Sudah Berhasil Terupdate"
     )
 }
 
@@ -42,6 +38,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     VoteXTheme {
-        Greeting("Android")
+        Test()
     }
 }
