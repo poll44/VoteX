@@ -4,43 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.votex.ui.theme.VoteXTheme
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.LoginPage
+import com.example.myapplication.RegisterPage
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        auth = Firebase.auth
+        val currentUser = auth.currentUser
+        val startDestination = if (currentUser != null) "home" else "login"
         setContent {
-            VoteXTheme {
-                Test()
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = startDestination) {
+                composable("login") { LoginPage(navController = navController) }
+                composable("register") { RegisterPage(navController = navController) }
+                composable("home") { HomePage(navController = navController) }
             }
         }
-    }
-}
-
-@Composable
-fun Test() {
-    Image(
-        painter = painterResource(id = R.drawable.convomfs_on_twitter),
-        contentDescription = null,
-        modifier = Modifier.size(500.dp),
-        alignment = Alignment.Center
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VoteXTheme {
-        Test()
     }
 }
