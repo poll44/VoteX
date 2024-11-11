@@ -1,5 +1,3 @@
-package com.example.votex
-
 import android.content.ContentValues
 import android.util.Log
 import android.widget.Toast
@@ -37,14 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.votex.R
-import com.example.votex.ui.theme.VoteXTheme
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 
 private lateinit var auth: FirebaseAuth
 
@@ -56,43 +50,29 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
     var repeatPassword by remember { mutableStateOf("") }
 
     fun signup(email: String, password: String) {
-        auth = Firebase.auth
+        auth = FirebaseAuth.getInstance()
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(
-                        ContentValues.TAG,
-                        "createUserWithEmail:success"
-                    )
+                    Log.d(ContentValues.TAG, "createUserWithEmail:success")
                     val user = auth.currentUser?.email
-                    Toast.makeText(
-                        mContext,
-                        user.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(mContext, "User registered: $user", Toast.LENGTH_SHORT).show()
                     navController.navigate("home")
                 } else {
-                    Log.w(
-                        ContentValues.TAG,
-                        "createUserWithEmail:failure", task.exception
-                    )
-                    Toast.makeText(
-                        mContext,
-                        task.exception.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    navController.navigate("home")
+                    Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
+                    Toast.makeText(mContext, "Registration failed: ${task.exception}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
     Image(
         painter = painterResource(id = R.drawable.ic_main_background),
         contentDescription = "Logo",
         modifier = Modifier.fillMaxSize()
     )
+
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -102,11 +82,13 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
         )
 
         Text(
-            text = "Fast, easy and secure digital"+"\nvoting platform",
+            text = "Fast, easy and secure digital\nvoting platform",
             color = Color.White,
             textAlign = TextAlign.Center
         )
+
         Spacer(modifier = Modifier.height(20.dp))
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,32 +97,9 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(10.dp)),
             value = email,
             label = { Text("Alamat Email") },
-            visualTransformation = PasswordVisualTransformation(),
             onValueChange = { newText -> email = newText }
         )
-//        TextField(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(50.dp)
-//                .padding(horizontal = 20.dp, vertical = 5.dp)
-//                .clip(RoundedCornerShape(10.dp)),
-//            value = "",
-//            label = { Text("Nama Depan") },
-//            visualTransformation = PasswordVisualTransformation(),
-//            onValueChange = {  }
-//        )
-//
-//        TextField(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(50.dp)
-//                .padding(horizontal = 20.dp, vertical = 5.dp)
-//                .clip(RoundedCornerShape(10.dp)),
-//            value = "",
-//            label = { Text("Nama Belakang") },
-//            visualTransformation = PasswordVisualTransformation(),
-//            onValueChange = {  }
-//        )
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -152,6 +111,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             onValueChange = { newText -> password = newText }
         )
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -163,6 +123,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             onValueChange = { repeatPassword = it }
         )
+
         Button(
             modifier = Modifier
                 .size(width = 450.dp, height = 60.dp)
@@ -170,28 +131,29 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(50.dp)),
             colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
             onClick = {
-                if (email.isNotEmpty() && password.isNotEmpty()){
-                    if (password == repeatPassword){
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    if (password == repeatPassword) {
                         signup(email, password)
-                        navController.navigate("home")
-
+                    } else {
+                        Toast.makeText(mContext, "Passwords do not match", Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    Toast.makeText(
-                        mContext, "Please fill all the textfield above", Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(mContext, "Please fill all the fields", Toast.LENGTH_LONG).show()
                 }
             },
         ) {
-            Text(text = "SIGN IN")
+            Text(text = "SIGN UP")
         }
+
         Text(
             modifier = Modifier.padding(10.dp),
             text = "Forgot Password?",
             color = Color.White,
             textAlign = TextAlign.End
         )
+
         Spacer(modifier = Modifier.height(15.dp))
+
         Row {
             Text(
                 text = "Belum punya akun? ",
@@ -200,15 +162,16 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 style = TextStyle.Default
             )
             Text(
-                modifier = Modifier.clickable { },
+                modifier = Modifier.clickable { /* Navigate to sign up screen */ },
                 text = "Daftar sekarang!",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
                 style = TextStyle(textDecoration = TextDecoration.Underline)
             )
         }
+
         Button(
-            onClick = {  },
+            onClick = { /* Google sign-in logic here */ },
             modifier = Modifier
                 .width(250.dp)
                 .height(90.dp)

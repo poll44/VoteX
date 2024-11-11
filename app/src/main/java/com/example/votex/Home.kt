@@ -50,7 +50,6 @@ private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
     var userEmail: String = ""
@@ -60,31 +59,16 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
     if (!LocalInspectionMode.current){
         auth = Firebase.auth
         val currentUser = auth.currentUser
-        if(currentUser != null){
-            userEmail = currentUser.email.toString()
+        if (currentUser != null) {
+            val email = currentUser.email.toString()
+            userEmail = email.substringBefore("@")
             userId = currentUser.uid
         }
         database = Firebase.database
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xffcb0074)),
-                title = {
-                    Text(
-                        text = "TODO APP",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            )
-        }
-    ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
         ) {
             Text(
                 text = "Selamat datang.",
@@ -100,14 +84,7 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                 fontSize = 25.sp,
                 color = Color.Gray
             )
-            Text(
-                text = userId,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                fontSize = 25.sp,
-                color = Color.Gray
-            )
+            
             Button(
                 onClick = {
                     Firebase.auth.signOut()
@@ -124,4 +101,3 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
             }
         }
     }
-}

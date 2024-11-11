@@ -1,5 +1,6 @@
 package com.example.votex
 
+import RegisterPage
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
         auth = Firebase.auth
         val currentUser = auth.currentUser
-        val startDestination = if (currentUser != null) "home" else "login"
+        val startDestination = if (currentUser != null) "home" else "register"
 
         setContent {
             val navController = rememberNavController()

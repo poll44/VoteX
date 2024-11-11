@@ -37,15 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import com.example.votex.R
-import com.example.votex.ui.theme.VoteXTheme
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 
 private lateinit var auth: FirebaseAuth
 
@@ -54,46 +49,39 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
     val mContext = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var repeatPassword by remember { mutableStateOf("") }
 
+    // Fungsi untuk login menggunakan Firebase
     fun signin(email: String, password: String) {
-        auth = Firebase.auth
-        auth.createUserWithEmailAndPassword(email, password)
+        auth = FirebaseAuth.getInstance() // Inisialisasi FirebaseAuth
+        auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(
-                        ContentValues.TAG,
-                        "createUserWithEmail:success"
-                    )
+                    Log.d(ContentValues.TAG, "signInWithEmail:success")
                     val user = auth.currentUser?.email
                     Toast.makeText(
                         mContext,
-                        user.toString(),
+                        "Logged in as $user",
                         Toast.LENGTH_SHORT
                     ).show()
                     navController.navigate("home")
                 } else {
-                    Log.w(
-                        ContentValues.TAG,
-                        "createUserWithEmail:failure", task.exception
-                    )
+                    Log.w(ContentValues.TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(
                         mContext,
-                        task.exception.toString(),
+                        "Authentication failed: ${task.exception}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navController.navigate("home")
                 }
             }
     }
+
     Image(
         painter = painterResource(id = R.drawable.ic_main_background),
         contentDescription = "Logo",
         modifier = Modifier.fillMaxSize()
     )
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -103,25 +91,28 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
         )
 
         Text(
-            text = "Fast, easy and secure digital"+"\nvoting platform",
+            text = "Fast, easy and secure digital\nvoting platform",
             color = Color.White,
             textAlign = TextAlign.Center
         )
+
         Spacer(modifier = Modifier.height(20.dp))
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(10.dp)),
             value = email,
             label = { Text("Alamat Email") },
             onValueChange = { email = it }
         )
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(10.dp)),
             value = password,
@@ -129,6 +120,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             onValueChange = { password = it }
         )
+
         Button(
             modifier = Modifier
                 .size(width = 450.dp, height = 60.dp)
@@ -136,27 +128,27 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(10.dp)),
             colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
             onClick = {
-                if (email.isNotEmpty() && password.isNotEmpty()){
-                    if (password == repeatPassword){
-                        signin(email, password)
-                        navController.navigate("home")
-                    }
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    signin(email, password)
                 } else {
                     Toast.makeText(
-                        mContext, "Please fill all the textfield above", Toast.LENGTH_LONG
+                        mContext, "Please fill all the fields above", Toast.LENGTH_LONG
                     ).show()
                 }
             },
         ) {
             Text(text = "LOG IN")
         }
+
         Text(
             modifier = Modifier.padding(10.dp),
             text = "Forgot Password?",
             color = Color.White,
             textAlign = TextAlign.End
         )
+
         Spacer(modifier = Modifier.height(165.dp))
+
         Row {
             Text(
                 text = "Belum punya akun? ",
@@ -165,15 +157,16 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
                 style = TextStyle.Default
             )
             Text(
-                modifier = Modifier.clickable { },
+                modifier = Modifier.clickable { /* Add navigation to register page */ },
                 text = "Daftar sekarang!",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
                 style = TextStyle(textDecoration = TextDecoration.Underline)
             )
         }
+
         Button(
-            onClick = {  },
+            onClick = { /* Add Google sign-in logic here */ },
             modifier = Modifier
                 .width(250.dp)
                 .height(90.dp)
