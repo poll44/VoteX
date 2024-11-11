@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -47,98 +48,191 @@ import com.google.firebase.auth.auth
 
 private lateinit var auth: FirebaseAuth
 
-@Preview
 @Composable
-fun RegisterPage() {
+fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
+    val mContext = LocalContext.current
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var repeatPassword by remember { mutableStateOf("") }
+
+    fun signup(email: String, password: String) {
+        auth = Firebase.auth
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(
+                        ContentValues.TAG,
+                        "createUserWithEmail:success"
+                    )
+                    val user = auth.currentUser?.email
+                    Toast.makeText(
+                        mContext,
+                        user.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navController.navigate("home")
+                } else {
+                    Log.w(
+                        ContentValues.TAG,
+                        "createUserWithEmail:failure", task.exception
+                    )
+                    Toast.makeText(
+                        mContext,
+                        task.exception.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navController.navigate("home")
+                }
+            }
+    }
+    Image(
+        painter = painterResource(id = R.drawable.ic_main_background),
+        contentDescription = "Logo",
+        modifier = Modifier.fillMaxSize()
+    )
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xFF008753)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.group_53),
             contentDescription = "Logo",
-            modifier = Modifier
-                .width(200.dp)
-                .height(100.dp)
+            modifier = Modifier.size(180.dp)
         )
-        Spacer(modifier = Modifier.height(50.dp))
+
         Text(
-            text = "Learn Graphic and UI/UX designing in Hindi \n " + "for free live project",
+            text = "Fast, easy and secure digital"+"\nvoting platform",
             color = Color.White,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(50.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            value = "",
-            onValueChange = {})
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 5.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            value = "",
+                .clip(RoundedCornerShape(10.dp)),
+            value = email,
+            label = { Text("Alamat Email") },
             visualTransformation = PasswordVisualTransformation(),
-            onValueChange = {  }
+            onValueChange = { newText -> email = newText }
+        )
+//        TextField(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//                .padding(horizontal = 20.dp, vertical = 5.dp)
+//                .clip(RoundedCornerShape(10.dp)),
+//            value = "",
+//            label = { Text("Nama Depan") },
+//            visualTransformation = PasswordVisualTransformation(),
+//            onValueChange = {  }
+//        )
+//
+//        TextField(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//                .padding(horizontal = 20.dp, vertical = 5.dp)
+//                .clip(RoundedCornerShape(10.dp)),
+//            value = "",
+//            label = { Text("Nama Belakang") },
+//            visualTransformation = PasswordVisualTransformation(),
+//            onValueChange = {  }
+//        )
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .padding(horizontal = 20.dp, vertical = 5.dp)
+                .clip(RoundedCornerShape(10.dp)),
+            value = password,
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            onValueChange = { newText -> password = newText }
         )
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(50.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
-                .clip(RoundedCornerShape(50.dp)),
-            value = "",
+                .clip(RoundedCornerShape(10.dp)),
+            value = repeatPassword,
+            label = { Text("Confirm Password") },
             visualTransformation = PasswordVisualTransformation(),
-            onValueChange = { }
+            onValueChange = { repeatPassword = it }
         )
         Button(
-            colors = ButtonDefaults.buttonColors(Color(0xFFFF9800)),
-            onClick = {},
+            modifier = Modifier
+                .size(width = 450.dp, height = 60.dp)
+                .padding(horizontal = 20.dp, vertical = 5.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
+            onClick = {
+                if (email.isNotEmpty() && password.isNotEmpty()){
+                    if (password == repeatPassword){
+                        signup(email, password)
+                        navController.navigate("home")
+
+                    }
+                } else {
+                    Toast.makeText(
+                        mContext, "Please fill all the textfield above", Toast.LENGTH_LONG
+                    ).show()
+                }
+            },
         ) {
-            Text(text = "REGISTER")
+            Text(text = "SIGN IN")
         }
         Text(
             modifier = Modifier.padding(10.dp),
-            text = " Forgot Password?",
+            text = "Forgot Password?",
             color = Color.White,
-            textAlign = TextAlign.Right
+            textAlign = TextAlign.End
         )
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(15.dp))
         Row {
             Text(
-                text = "Don't have an account? ",
+                text = "Belum punya akun? ",
                 color = Color.White,
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Medium,
                 style = TextStyle.Default
             )
             Text(
                 modifier = Modifier.clickable { },
-                text = "Register now",
+                text = "Daftar sekarang!",
                 color = Color.White,
-                fontWeight = FontWeight.Light,
+                fontWeight = FontWeight.Medium,
                 style = TextStyle(textDecoration = TextDecoration.Underline)
             )
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        Row {
-            Text(
-                text = "By signing up, you are agree with our ",
-                color = Color.White,
-                fontWeight = FontWeight.Light,
-                style = TextStyle.Default
+        Button(
+            onClick = {  },
+            modifier = Modifier
+                .width(250.dp)
+                .height(90.dp)
+                .padding(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
             )
-            Text(
-                modifier = Modifier.clickable { },
-                text = "Terms & Conditions",
-                color = Color.White,
-                fontWeight = FontWeight.Light,
-                style = TextStyle(textDecoration = TextDecoration.Underline)
-            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.pngwing_com),
+                    contentDescription = "Google logo",
+                    modifier = Modifier.size(35.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Sign in with Google")
+            }
         }
     }
 }

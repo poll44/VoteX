@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "820923854763",
+    "project_id": "projekpapb-aa1bd",
+    "storage_bucket": "projekpapb-aa1bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820923854763:android:b88b9dc913cb66c58e2cee",
+        "android_client_info": {
+          "package_name": "com.example.votex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxQR8mXMizJRWvb2xyq2Khwv2eOq3KIGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
