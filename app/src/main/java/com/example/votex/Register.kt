@@ -92,7 +92,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(10.dp)),
             value = email,
@@ -103,7 +103,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(10.dp)),
             value = password,
@@ -115,7 +115,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .padding(horizontal = 20.dp, vertical = 5.dp)
                 .clip(RoundedCornerShape(10.dp)),
             value = repeatPassword,
