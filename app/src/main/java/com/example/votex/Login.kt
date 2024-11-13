@@ -137,7 +137,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
                 }
             },
         ) {
-            Text(text = "LOG IN")
+            Text(text = "MASUK")
         }
 
         Text(
@@ -147,7 +147,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
             textAlign = TextAlign.End
         )
 
-        Spacer(modifier = Modifier.height(165.dp))
+        Spacer(modifier = Modifier.height(210.dp))
 
         Row {
             Text(
@@ -157,7 +157,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
                 style = TextStyle.Default
             )
             Text(
-                modifier = Modifier.clickable { /* Add navigation to register page */ },
+                modifier = Modifier.clickable { navController.navigate("register") },
                 text = "Daftar sekarang!",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,

@@ -142,7 +142,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 }
             },
         ) {
-            Text(text = "SIGN UP")
+            Text(text = "DAFTAR")
         }
 
         Text(
@@ -152,8 +152,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
             textAlign = TextAlign.End
         )
 
-        Spacer(modifier = Modifier.height(15.dp))
-
+        Spacer(modifier = Modifier.height(150.dp))
         Row {
             Text(
                 text = "Belum punya akun? ",
@@ -162,8 +161,8 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 style = TextStyle.Default
             )
             Text(
-                modifier = Modifier.clickable { /* Navigate to sign up screen */ },
-                text = "Daftar sekarang!",
+                modifier = Modifier.clickable { navController.navigate("login") },
+                text = "Masuk sekarang!",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
                 style = TextStyle(textDecoration = TextDecoration.Underline)

@@ -35,6 +35,7 @@ class SplashActivity : ComponentActivity() {
                 SplashScreen()
             }
         }
+        getActionBar()?.hide()
     }
 }
 

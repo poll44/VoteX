@@ -1,8 +1,5 @@
 package com.example.votex
 
-import android.accounts.OnAccountsUpdateListener
-import android.widget.Checkable
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -51,10 +48,10 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
         }
         database = Firebase.database
     }
-    Spacer(modifier = Modifier.height(10.dp))
     Column (
         modifier = Modifier.fillMaxSize().background(Color(0xFFEFEFEF))
     ){
+        Spacer(modifier = Modifier.height(20.dp))
         Box (
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,7 +70,31 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                         color = Color(0xFF008753)
                     )
                     Text(
-                        text = "Hi,$userEmail"
+                        text = "Hi, $userEmail"
+                    )
+                }
+                Image(painter = painterResource(R.drawable.group_54), contentDescription = null)
+            }
+        }
+        Box (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color(0xFFFFFFFF))
+        ) {
+            Row (
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ){
+                Column (modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Hello!",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF008753)
+                    )
+                    Text(
+                        text = "Hi, $userEmail"
                     )
                 }
                 Image(painter = painterResource(R.drawable.group_54), contentDescription = null)
