@@ -137,7 +137,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
                 }
             },
         ) {
-            Text(text = "LOG IN")
+            Text(text = "MASUK")
         }
 
         Text(
@@ -147,7 +147,7 @@ fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
             textAlign = TextAlign.End
         )
 
-        Spacer(modifier = Modifier.height(165.dp))
+        Spacer(modifier = Modifier.height(210.dp))
 
         Row {
             Text(
