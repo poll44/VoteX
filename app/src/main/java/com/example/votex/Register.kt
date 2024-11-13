@@ -162,7 +162,7 @@ fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
                 style = TextStyle.Default
             )
             Text(
-                modifier = Modifier.clickable { /* Navigate to sign up screen */ },
+                modifier = Modifier.clickable { navController.navigate("login") },
                 text = "Daftar sekarang!",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
