@@ -3,7 +3,6 @@ package com.example.votex
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,26 +17,33 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -49,10 +55,12 @@ private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
 @Composable
-fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
+fun SearchPage(navController: NavController) {
+    var text by remember { mutableStateOf("") }
     var userEmail: String = ""
     var userId: String = ""
     val mContext = LocalContext.current
+
 
     if (!LocalInspectionMode.current){
         auth = Firebase.auth
@@ -64,10 +72,14 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
         database = Firebase.database
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF0F0F0))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF0F0F0))
         ) {
             Spacer(modifier = Modifier.height(40.dp))
             Box(
@@ -97,45 +109,44 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                     )
                 }
             }
-            Box(
+            Text(text = "Search", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFFFFFFFF))
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                TextField(
+                    value = text,
+                    onValueChange = { newtext -> text = newtext },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    },
+                    placeholder = { Text("Cari judul atau id") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(15.dp),
+                    colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .height(35.dp)
-                        .background(Color.White)
-                        .clip(RoundedCornerShape(20.dp))
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .height(50.dp)
+                )
+
+                Button(
+                    onClick = {  },
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(start = 8.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF008753))
                 ) {
-                    Text(
-                        text = "Dibuat",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF008753)
-                    )
-
-                    Divider(
-                        color = Color.LightGray,
-                        modifier = Modifier
-                            .height(16.dp)
-                            .width(2.dp)
-                    )
-
-                    Text(
-                        modifier = Modifier.clickable { navController.navigate("participated")},
-                        text = "Berpartisipasi",
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(text = "Cari", fontSize = 16.sp, color = Color.White)
                 }
             }
-
+            Text(text = "Recommendation", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             /**
              * list yang dibuat
              */
@@ -157,7 +168,9 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                                 .clip(CircleShape)
                                 .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = CircleShape)
                         )
-                        Spacer(modifier = Modifier.width(8.dp).height(8.dp))
+                        Spacer(modifier = Modifier
+                            .width(8.dp)
+                            .height(8.dp))
                         Column(
                             modifier = Modifier.weight(1f)
                         ) {
@@ -211,19 +224,6 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                 }
             }
         }
-        IconButton(
-            onClick = { /* aksi saat diklik */ },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 80.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Icon",
-                tint = Color(0xFF008753),
-                modifier = Modifier.fillMaxSize().background(color = Color.White, shape = CircleShape)
-            )
-        }
         /**
          * Bottom Navigation Bar
          */
@@ -245,10 +245,10 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                     .clip(RoundedCornerShape(15.dp))
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = {navController.navigate("home")},
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.group_54),
+                        painter = painterResource(R.drawable.vector),
                         contentDescription = null
                     )
                 }
@@ -259,10 +259,10 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                         .width(2.dp)
                 )
                 IconButton(
-                    onClick = {navController.navigate("search")},
+                    onClick = {},
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.group_51),
+                        painter = painterResource(R.drawable.group_55),
                         contentDescription = null
                     )
                 }
