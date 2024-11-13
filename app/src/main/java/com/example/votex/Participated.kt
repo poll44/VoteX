@@ -48,8 +48,9 @@ import com.google.firebase.database.database
 private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
+
 @Composable
-fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
+fun ParticipatedPage(navController: NavController, modifier: Modifier = Modifier) {
     var userEmail: String = ""
     var userId: String = ""
     val mContext = LocalContext.current
@@ -116,9 +117,9 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                         .clip(RoundedCornerShape(20.dp))
                 ) {
                     Text(
+                        modifier = Modifier.clickable { navController.navigate("home")},
                         text = "Dibuat",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF008753)
+                        fontWeight = FontWeight.Bold
                     )
 
                     Divider(
@@ -129,9 +130,9 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                     )
 
                     Text(
-                        modifier = Modifier.clickable { navController.navigate("participated")},
                         text = "Berpartisipasi",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF008753)
                     )
                 }
             }

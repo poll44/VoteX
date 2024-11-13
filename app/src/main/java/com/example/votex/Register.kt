@@ -2,7 +2,6 @@ import android.content.ContentValues
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,7 @@ import com.google.firebase.auth.FirebaseAuth
 private lateinit var auth: FirebaseAuth
 
 @Composable
-fun RegisterPage(navController: NavController, modifier: Modifier = Modifier) {
+fun RegisterPage(navController: NavController) {
     val mContext = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
