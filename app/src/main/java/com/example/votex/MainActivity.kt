@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
         auth = Firebase.auth
         val currentUser = auth.currentUser
-        val startDestination = if (currentUser != null) "search" else "login"
+        val startDestination = if (currentUser != null) "profile" else "register   "
 
         setContent {
             val navController = rememberNavController()
@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
                 composable("participated") { ParticipatedPage(navController = navController) }
                 composable("search") { SearchPage(navController = navController) }
                 composable("profile") { ProfilePage(navController = navController) }
+                composable("editProfile") { EditProfilePage(navController = navController)}
             }
         }
     }

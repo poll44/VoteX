@@ -58,7 +58,7 @@ private lateinit var database: FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfilePage(navController: NavController) {
+fun EditProfilePage(navController: NavController) {
     var email: String = ""
     var userEmail: String = ""
     var password: String = ""
@@ -110,7 +110,7 @@ fun ProfilePage(navController: NavController) {
                     )
                 }
             }
-            Text(text = "Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+            Text(text = "Edit Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,12 +225,12 @@ fun ProfilePage(navController: NavController) {
 
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
                     Button(
-                        onClick = { navController.navigate("editProfile") },
+                        onClick = { navController.navigate("Profile") },
                         modifier = Modifier.align(Alignment.BottomEnd),
                         colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                         shape = RoundedCornerShape(50)
                     ) {
-                        Text(text = "Ubah", color = Color.White)
+                        Text(text = "Simpan", color = Color.White)
                     }
                 }
             }

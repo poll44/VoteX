@@ -128,11 +128,11 @@ fun SearchPage(navController: NavController) {
                     placeholder = { Text("Cari judul atau id") },
                     singleLine = true,
                     shape = RoundedCornerShape(15.dp),
-                    colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White),
+                    colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White, unfocusedIndicatorColor = Color.White),
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)
-                        .height(50.dp)
+                        .height(55.dp)
                 )
 
                 Button(
