@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
         auth = Firebase.auth
         val currentUser = auth.currentUser
-        val startDestination = if (currentUser != null) "profile" else "register   "
+        val startDestination = if (currentUser != null) "profile" else "register"
 
         setContent {
             val navController = rememberNavController()
@@ -35,5 +35,6 @@ class MainActivity : ComponentActivity() {
                 composable("editProfile") { EditProfilePage(navController = navController)}
             }
         }
+        getActionBar()?.hide()
     }
 }
