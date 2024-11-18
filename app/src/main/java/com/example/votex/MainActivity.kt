@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
                 composable("editProfile") { EditProfilePage(navController = navController)}
                 composable("credential") { CredentialPage(navController = navController)}
                 composable("election") { ElectionPage(navController = navController)}
+                composable("public") { PublicPrivatePage(navController = navController)}
             }
         }
         getActionBar()?.hide()
