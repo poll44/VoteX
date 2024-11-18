@@ -35,7 +35,7 @@ fun PublicPrivatePage(navController: NavController) {
     var endDateTime by remember { mutableStateOf(Calendar.getInstance()) }
     var endHour by remember { mutableStateOf("") }
     var endMinute by remember { mutableStateOf("") }
-    var options by remember { mutableStateOf(mutableListOf("Pilihan 1", "Pilihan 2", "Pilihan 3")) }
+    var options by remember { mutableStateOf(mutableListOf("", "", "")) }
     var votePin by remember { mutableStateOf("") } // State for Vote PIN
 
     val context = LocalContext.current
@@ -80,7 +80,7 @@ fun PublicPrivatePage(navController: NavController) {
                     }
                 }
 
-                Text(text = "Lakukan voting Anda sendiri", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+                Text(text = "Buatlah voting Anda sendiri", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             }
 
             item {
@@ -91,19 +91,34 @@ fun PublicPrivatePage(navController: NavController) {
                         .clip(RoundedCornerShape(15.dp))
                         .background(Color(0xFFFFFFFF))
                 ) {
-                    // Type of voting
-                    Row(modifier = Modifier .padding(10.dp),
+                    Row(modifier = Modifier.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
+
                         RadioButton(
                             selected = voteType == VoteType.Public,
-                            onClick = { voteType = VoteType.Public }
+                            onClick = { voteType = VoteType.Public },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF008753),
+                                unselectedColor = Color.Gray
+                            )
                         )
-                        Text(text = "Publik")
+                        Text(
+                            text = "Publik",
+                            color = if (voteType == VoteType.Public) Color(0xFF008753) else Color.Gray // Change color based on selection
+                        )
+
                         RadioButton(
                             selected = voteType == VoteType.Private,
-                            onClick = { voteType = VoteType.Private }
+                            onClick = { voteType = VoteType.Private },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF008753),
+                                unselectedColor = Color.Gray
+                            )
                         )
-                        Text(text = "Privat")
+                        Text(
+                            text = "Privat",
+                            color = if (voteType == VoteType.Private) Color(0xFF008753) else Color.Gray // Change color based on selection
+                        )
                     }
 
                     Row(modifier = Modifier .padding(10.dp),
@@ -120,11 +135,13 @@ fun PublicPrivatePage(navController: NavController) {
                             value = voteTitle,
                             onValueChange = { voteTitle = it },
                             label = { Text("Judul") },
-                            placeholder = { Text("contoh: Makanan Favorit") }
+                            placeholder = { Text("contoh: Makanan Favorit") },
+                            modifier = Modifier
+                                .fillMaxWidth()
                         )
                     }
 
-                    Row(modifier = Modifier .padding(10.dp),
+                    Row(modifier = Modifier.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         // Description
                         OutlinedTextField(
@@ -138,7 +155,10 @@ fun PublicPrivatePage(navController: NavController) {
                             value = voteDescription,
                             onValueChange = { voteDescription = it },
                             label = { Text("Deskripsi") },
-                            placeholder = { Text("contoh: Ini merupakan...") }
+                            placeholder = { Text("contoh: Ini merupakan...") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 100.dp) // Set a minimum height for the text field
                         )
                     }
 
@@ -150,6 +170,7 @@ fun PublicPrivatePage(navController: NavController) {
                             shape = RoundedCornerShape(50)) {
                             Text("Pilih Foto")
                         }
+                        Spacer(modifier = Modifier.width(2.dp))
                         Text(selectedPhoto ?: "Tidak ada file yang dipilih")
                     }
 
@@ -198,7 +219,7 @@ fun PublicPrivatePage(navController: NavController) {
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(10.dp)
                     )
-                    Column (modifier = Modifier .padding(10.dp)) {
+                    Column(modifier = Modifier.padding(10.dp)) {
                         options.forEachIndexed { index, option ->
                             OutlinedTextField(
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -209,16 +230,18 @@ fun PublicPrivatePage(navController: NavController) {
                                     unfocusedLabelColor = Color.Gray
                                 ),
                                 value = option,
-                                onValueChange = { options[index] = it },
+                                onValueChange = { newValue ->
+                                    options[index] = newValue
+                                },
                                 label = { Text("Pilihan") },
-                                placeholder = { Text("Masukkan Pilihan") }
+                                placeholder = { Text("Masukkan Pilihan") },
                             )
                         }
                     }
 
                     Row(modifier = Modifier .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        Button(onClick = { options.add("Tambah Pilihan") },
+                        Button(onClick = { options.add("") },
                             colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                             shape = RoundedCornerShape(50)) {
                             Text("Tambah Pilihan")
