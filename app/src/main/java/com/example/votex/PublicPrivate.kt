@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,17 +21,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 
-private lateinit var auth: FirebaseAuth
-private lateinit var database: FirebaseDatabase
-private lateinit var userId: String
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicPrivatePage(navController: NavController) {
+    var isDialogOpen by remember { mutableStateOf(false) }
     var voteTitle by remember { mutableStateOf("") }
     var voteDescription by remember { mutableStateOf("") }
     var voteType by remember { mutableStateOf(VoteType.Public) }
@@ -40,6 +36,7 @@ fun PublicPrivatePage(navController: NavController) {
     var endHour by remember { mutableStateOf("") }
     var endMinute by remember { mutableStateOf("") }
     var options by remember { mutableStateOf(mutableListOf("Pilihan 1", "Pilihan 2", "Pilihan 3")) }
+    var votePin by remember { mutableStateOf("") } // State for Vote PIN
 
     val context = LocalContext.current
 
@@ -108,10 +105,18 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                         Text(text = "Privat")
                     }
+
                     Row(modifier = Modifier .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         // Header
                         OutlinedTextField(
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF008753),
+                                unfocusedBorderColor = Color.Gray,
+                                cursorColor = Color(0xFF008753),
+                                focusedLabelColor = Color(0xFF008753),
+                                unfocusedLabelColor = Color.Gray
+                            ),
                             value = voteTitle,
                             onValueChange = { voteTitle = it },
                             label = { Text("Judul") },
@@ -123,6 +128,13 @@ fun PublicPrivatePage(navController: NavController) {
                         verticalAlignment = Alignment.CenterVertically) {
                         // Description
                         OutlinedTextField(
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF008753),
+                                unfocusedBorderColor = Color.Gray,
+                                cursorColor = Color(0xFF008753),
+                                focusedLabelColor = Color(0xFF008753),
+                                unfocusedLabelColor = Color.Gray
+                            ),
                             value = voteDescription,
                             onValueChange = { voteDescription = it },
                             label = { Text("Deskripsi") },
@@ -145,6 +157,13 @@ fun PublicPrivatePage(navController: NavController) {
                         verticalAlignment = Alignment.CenterVertically) {
                         // End date
                         OutlinedTextField(
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF008753),
+                                unfocusedBorderColor = Color.Gray,
+                                cursorColor = Color(0xFF008753),
+                                focusedLabelColor = Color(0xFF008753),
+                                unfocusedLabelColor = Color.Gray
+                            ),
                             value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(endDateTime.time),
                             onValueChange = { /* handle change */ },
                             label = { Text("Tanggal Berakhir (DD/MM/YYYY)") },
@@ -154,17 +173,23 @@ fun PublicPrivatePage(navController: NavController) {
                     }
 
                     // End time
-
-                    Row(modifier = Modifier .padding(10.dp),
+                    Row(modifier = Modifier.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF008753),
+                                unfocusedBorderColor = Color.Gray,
+                                cursorColor = Color(0xFF008753),
+                                focusedLabelColor = Color(0xFF008753),
+                                unfocusedLabelColor = Color.Gray
+                            ),
                             value = endHour,
                             onValueChange = { endHour = it },
                             label = { Text("Waktu Berakhir (HH:MM)") },
                             placeholder = { Text("e.g., 14:00") }
                         )
                         IconButton(onClick = { /* handle time picker */ }) {
-                            Icon(imageVector = Icons.Default.DateRange, contentDescription = "Pilih Waktu")
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Pilih Waktu")
                         }
                     }
 
@@ -176,6 +201,13 @@ fun PublicPrivatePage(navController: NavController) {
                     Column (modifier = Modifier .padding(10.dp)) {
                         options.forEachIndexed { index, option ->
                             OutlinedTextField(
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = Color(0xFF008753),
+                                    unfocusedBorderColor = Color.Gray,
+                                    cursorColor = Color(0xFF008753),
+                                    focusedLabelColor = Color(0xFF008753),
+                                    unfocusedLabelColor = Color.Gray
+                                ),
                                 value = option,
                                 onValueChange = { options[index] = it },
                                 label = { Text("Pilihan") },
@@ -193,16 +225,70 @@ fun PublicPrivatePage(navController: NavController) {
                         }
                     }
 
+                    if (voteType == VoteType.Private) {
+                        Row(modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedBorderColor = Color(0xFF008753),
+                                    unfocusedBorderColor = Color.Gray,
+                                    cursorColor = Color(0xFF008753),
+                                    focusedLabelColor = Color(0xFF008753),
+                                    unfocusedLabelColor = Color.Gray
+                                ),
+                                value = votePin,
+                                onValueChange = { votePin = it },
+                                label = { Text("Vote PIN") },
+                                placeholder = { Text("Masukkan Vote PIN") }
+                            )
+                        }
+
+                    }
+
                     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
                         Button(onClick = {
-                            // Handle form submission
-                            Toast.makeText(context, "Voting Telah Dibuat!", Toast.LENGTH_SHORT).show()
+                            isDialogOpen = true
                         },  modifier = Modifier.align(Alignment.BottomEnd),
                             colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                             shape = RoundedCornerShape(50)) {
                             Text("Buat")
                         }
                     }
+                    if (isDialogOpen) {
+                        AlertDialog(
+                            onDismissRequest = { isDialogOpen = false },
+                            title = {
+                                Text(text = if (voteType == VoteType.Private) "Kirim ke Privat" else "Kirim ke Publik")
+                            },
+                            text = {
+                                Text(text = if (voteType == VoteType.Private)
+                                    "Apakah Anda yakin ingin menyimpan dan mengirim vote ini secara privat?"
+                                else
+                                    "Apakah Anda yakin ingin menyimpan dan mengirim vote ini ke publik?")
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        Toast.makeText(context, "Voting Telah Dibuat!", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("Home")
+                                        isDialogOpen = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60))
+                                ) {
+                                    Text("Kirim")
+                                }
+                            },
+                            dismissButton = {
+                                Button(
+                                    onClick = { isDialogOpen = false },
+                                    colors = ButtonDefaults.buttonColors(Color.Red)
+                                ) {
+                                    Text("Batal")
+                                }
+                            }
+                        )
+                    }
+
                 }
             }
         }

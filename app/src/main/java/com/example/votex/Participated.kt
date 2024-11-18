@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -28,6 +29,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +56,7 @@ private lateinit var database: FirebaseDatabase
 
 @Composable
 fun ParticipatedPage(navController: NavController, modifier: Modifier = Modifier) {
+    var isDialogOpen by remember { mutableStateOf(false) }
     var userEmail: String = ""
     var userId: String = ""
     val mContext = LocalContext.current
@@ -212,8 +218,24 @@ fun ParticipatedPage(navController: NavController, modifier: Modifier = Modifier
                 }
             }
         }
+        if(isDialogOpen){
+            AlertDialog(
+                onDismissRequest = { isDialogOpen = false },
+                title = { Text(text = "Jenis Vote") },
+                text = { Text(text = "Silahkan pilih jenis voting anda!") },
+                confirmButton = {
+                    Button(onClick = { navController.navigate("Public")}, colors = ButtonDefaults.buttonColors(Color(0xFF008753))) {
+                        Text("Public/Private", color = Color.White)
+                    }
+                    Button(onClick = { navController.navigate("credential")}, colors = ButtonDefaults.buttonColors(Color(0xFFFF9500)
+                    )) {
+                        Text("Election")
+                    }
+                },
+            )
+        }
         IconButton(
-            onClick = { /* aksi saat diklik */ },
+            onClick = {isDialogOpen = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 80.dp)
