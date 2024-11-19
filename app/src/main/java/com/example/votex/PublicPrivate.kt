@@ -1,7 +1,11 @@
 package com.example.votex
 
+import android.app.AlertDialog
 import android.app.TimePickerDialog
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import java.text.SimpleDateFormat
@@ -28,6 +33,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicPrivatePage(navController: NavController) {
+    var selectedPhoto by remember { mutableStateOf<String?>(null) }
     var selectedDate by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -50,14 +56,21 @@ fun PublicPrivatePage(navController: NavController) {
         calendar.get(Calendar.MINUTE),
         true
     )
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            selectedPhoto = uri.toString() // Simpan URI gambar
+        }
+    }
     var isDialogOpen by remember { mutableStateOf(false) }
     var voteTitle by remember { mutableStateOf("") }
     var voteDescription by remember { mutableStateOf("") }
     var voteType by remember { mutableStateOf(VoteType.Public) }
-    var selectedPhoto by remember { mutableStateOf<String?>(null) }
-    var options by remember { mutableStateOf(mutableListOf("", "", "")) }
-    var votePin by remember { mutableStateOf("") } // State for Vote PIN
 
+    var options by remember { mutableStateOf(mutableListOf("", "", "")) }
+    var votePin by remember { mutableStateOf("") }
+    var isOptionOpen by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -181,16 +194,27 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                     }
 
-                    Row(modifier = Modifier .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        // Add Photo
-                        Button(onClick = { /* handle photo selection */ },
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Tombol Pilih Foto
+                        Button(
+                            onClick = {
+                                launcher.launch("image/*") // Memfilter hanya file gambar
+                            },
                             colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
-                            shape = RoundedCornerShape(50)) {
+                            shape = RoundedCornerShape(50)
+                        ) {
                             Text("Pilih Foto")
                         }
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(selectedPhoto ?: "Tidak ada file yang dipilih")
+                        Spacer(modifier = Modifier.width(8.dp)) // Spacer antara tombol dan teks
+                        Text(
+                            text = selectedPhoto ?: "Tidak ada file yang dipilih",
+                            modifier = Modifier.padding(start = 8.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
 
                     // End Date
@@ -246,38 +270,67 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                     }
 
-                    Text(
-                        text = "Pilihan Vote",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(10.dp)
-                    )
+
                     Column(modifier = Modifier.padding(10.dp)) {
+                        Text(
+                            text = "Pilihan Vote",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            modifier = Modifier.padding(10.dp)
+                        )
+
                         options.forEachIndexed { index, option ->
                             OutlinedTextField(
+                                value = option,
+                                onValueChange = { newValue ->
+                                    options[index] = newValue
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                label = { Text("Pilihan") },
+                                placeholder = { Text("Masukkan Pilihan") },
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
                                     focusedBorderColor = Color(0xFF008753),
                                     unfocusedBorderColor = Color.Gray,
                                     cursorColor = Color(0xFF008753),
                                     focusedLabelColor = Color(0xFF008753),
                                     unfocusedLabelColor = Color.Gray
-                                ),
-                                value = option,
-                                onValueChange = { newValue ->
-                                    options[index] = newValue
-                                },
-                                label = { Text("Pilihan") },
-                                placeholder = { Text("Masukkan Pilihan") },
+                                )
                             )
                         }
+
+                        // Tombol untuk menambah opsi baru
+                        Row(
+                            modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(
+                                onClick = {
+                                    options.add("")
+                                    isOptionOpen = true
+                                },
+                                colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text("Tambah Pilihan")
+                            }
+                        }
+
                     }
 
-                    Row(modifier = Modifier .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        Button(onClick = { options.add("") },
-                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
-                            shape = RoundedCornerShape(50)) {
-                            Text("Tambah Pilihan")
-                        }
+                    if(isOptionOpen) {
+                        AlertDialog(
+                            onDismissRequest = { isOptionOpen = false }, // Menutup dialog saat disentuh di luar
+                            confirmButton = {
+                                TextButton(onClick = { isOptionOpen = false }) {
+                                    Text("OK")
+                                }
+                            },
+                            title = {
+                                Text("TAMBAH BERHASIL")
+                            },
+                            text = {
+                                Text("Opsi baru telah ditambahkan.")
+                            }
+                        )
                     }
 
                     if (voteType == VoteType.Private) {
@@ -309,6 +362,7 @@ fun PublicPrivatePage(navController: NavController) {
                             Text("Buat")
                         }
                     }
+
                     if (isDialogOpen) {
                         AlertDialog(
                             onDismissRequest = { isDialogOpen = false },
