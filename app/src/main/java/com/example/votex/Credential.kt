@@ -2,6 +2,7 @@ package com.example.votex
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,14 +60,27 @@ fun CredentialPage(navController: NavController) {
     val options = listOf("NIM", "NIK", "Passport ID")
     var maxInput by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
     var isChecked1 by remember { mutableStateOf(false) }
     var isChecked2 by remember { mutableStateOf(false) }
     var isChecked3 by remember { mutableStateOf(false) }
     var isChecked4 by remember { mutableStateOf(false) }
     var isChecked5 by remember { mutableStateOf(false) }
+    var email: String = ""
+    var userEmail: String = ""
+    var password: String = ""
+    var userId: String = ""
+    val mContext = LocalContext.current
 
     if (!LocalInspectionMode.current){
         auth = Firebase.auth
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            email = currentUser.email.toString()
+            userEmail = email.substringBefore("@")
+            password = currentUser.providerId.toString()
+
+        }
         database = Firebase.database
     }
 
@@ -106,7 +121,7 @@ fun CredentialPage(navController: NavController) {
                 }
             }
 
-            Text(text = "Kredensial", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+            Text(text = "Credential", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -123,7 +138,7 @@ fun CredentialPage(navController: NavController) {
                 ) {
                     Text(
                         text = "Untuk menjaga keamanan dan integritas setiap suara yang diberikan, pengguna diharuskan mengisi beberapa kredensial penting sebelum memberikan suara. Silakan periksa apa saja yang harus diisi oleh pengguna.",
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
                         textAlign = TextAlign.Justify
                     )
                 }
@@ -132,11 +147,13 @@ fun CredentialPage(navController: NavController) {
                         checked = isChecked1,
                         onCheckedChange = { isChecked1 = it}
                         )
-                    Text(text = "Alamat Email", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
+                    Text(text = "Email", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
                 }
+
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        // Checkbox with label
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(
                                 checked = isChecked2,
@@ -148,6 +165,8 @@ fun CredentialPage(navController: NavController) {
                         }
 
                         if(isChecked2) {
+
+                        // Dropdown Menu
                         ExposedDropdownMenuBox(
                             expanded = expanded,
                             onExpandedChange = { expanded = !expanded }
@@ -156,8 +175,8 @@ fun CredentialPage(navController: NavController) {
                                 value = selectedOption,
                                 onValueChange = { selectedOption = it },
                                 readOnly = true,
-                                label = { Text("Jenis nomor identitas") },
-                                placeholder = { Text("Contoh: NIM, NIK, nomor ID paspor") },
+                                label = { Text("What do you want others to see") },
+                                placeholder = { Text("Example: NIM, NIK, Passport ID") },
                                 modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
                                 trailingIcon = {
                                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -178,12 +197,15 @@ fun CredentialPage(navController: NavController) {
                                 }
                             }
                         }
+
                         Spacer(modifier = Modifier.height(16.dp))
+
+                        // Max Input
                         OutlinedTextField(
                             value = maxInput,
                             onValueChange = { maxInput = it },
-                            label = { Text("Input maksimal") },
-                            placeholder = { Text("Contoh: 12") },
+                            label = { Text("Max input") },
+                            placeholder = { Text("Example: 69") },
                             modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
                         )
                     }
