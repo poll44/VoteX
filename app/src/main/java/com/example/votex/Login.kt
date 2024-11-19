@@ -45,14 +45,13 @@ import com.google.firebase.auth.FirebaseAuth
 private lateinit var auth: FirebaseAuth
 
 @Composable
-fun LoginPage(navController: NavController, modifier: Modifier = Modifier) {
+fun LoginPage(navController: NavController) {
     val mContext = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Fungsi untuk login menggunakan Firebase
     fun signin(email: String, password: String) {
-        auth = FirebaseAuth.getInstance() // Inisialisasi FirebaseAuth
+        auth = FirebaseAuth.getInstance()
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

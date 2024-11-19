@@ -1,10 +1,8 @@
 package com.example.votex
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,27 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -59,21 +48,11 @@ private lateinit var database: FirebaseDatabase
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfilePage(navController: NavController) {
-    var email: String = ""
-    var userEmail: String = ""
-    var password: String = ""
-    var userId: String = ""
-    val mContext = LocalContext.current
+    val email: String = ""
+    val userEmail: String = ""
 
     if (!LocalInspectionMode.current){
         auth = Firebase.auth
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            email = currentUser.email.toString()
-            userEmail = email.substringBefore("@")
-            password = currentUser.providerId.toString()
-
-        }
         database = Firebase.database
     }
 
@@ -162,7 +141,7 @@ fun ProfilePage(navController: NavController) {
                     value = email,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -181,7 +160,7 @@ fun ProfilePage(navController: NavController) {
                     visualTransformation = PasswordVisualTransformation(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -199,7 +178,7 @@ fun ProfilePage(navController: NavController) {
                     value = "12/12/2024",
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -217,7 +196,7 @@ fun ProfilePage(navController: NavController) {
                     value = "Malang",
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }

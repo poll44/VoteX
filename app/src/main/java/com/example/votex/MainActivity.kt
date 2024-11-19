@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
         auth = Firebase.auth
         val currentUser = auth.currentUser
-        val startDestination = if (currentUser != null) "home" else "register"
+        val startDestination = if (currentUser != null) "election" else "register"
 
         hideSystemUI()
         setContent {
