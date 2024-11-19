@@ -224,7 +224,7 @@ fun ParticipatedPage(navController: NavController) {
                 title = { Text(text = "Jenis Vote") },
                 text = { Text(text = "Silahkan pilih jenis voting anda!") },
                 confirmButton = {
-                    Button(onClick = { navController.navigate("Public")}, colors = ButtonDefaults.buttonColors(Color(0xFF008753))) {
+                    Button(onClick = { navController.navigate("publicPrivate")}, colors = ButtonDefaults.buttonColors(Color(0xFF008753))) {
                         Text("Public/Private", color = Color.White)
                     }
                     Button(onClick = { navController.navigate("credential")}, colors = ButtonDefaults.buttonColors(Color(0xFFFF9500)

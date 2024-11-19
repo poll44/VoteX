@@ -1,5 +1,6 @@
 package com.example.votex
 
+import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,18 +28,36 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublicPrivatePage(navController: NavController) {
+    var selectedDate by remember { mutableStateOf("") }
+    var selectedTime by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val calendar = android.icu.util.Calendar.getInstance()
+    val datePickerDialog = android.app.DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            selectedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
+        },
+        calendar.get(android.icu.util.Calendar.YEAR),
+        calendar.get(android.icu.util.Calendar.MONTH),
+        calendar.get(android.icu.util.Calendar.DAY_OF_MONTH)
+    )
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            selectedTime = String.format("%02d:%02d", hourOfDay, minute)
+        },
+        calendar.get(Calendar.HOUR_OF_DAY),
+        calendar.get(Calendar.MINUTE),
+        true
+    )
     var isDialogOpen by remember { mutableStateOf(false) }
     var voteTitle by remember { mutableStateOf("") }
     var voteDescription by remember { mutableStateOf("") }
     var voteType by remember { mutableStateOf(VoteType.Public) }
     var selectedPhoto by remember { mutableStateOf<String?>(null) }
-    var endDateTime by remember { mutableStateOf(Calendar.getInstance()) }
-    var endHour by remember { mutableStateOf("") }
-    var endMinute by remember { mutableStateOf("") }
     var options by remember { mutableStateOf(mutableListOf("", "", "")) }
     var votePin by remember { mutableStateOf("") } // State for Vote PIN
 
-    val context = LocalContext.current
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -174,44 +193,57 @@ fun PublicPrivatePage(navController: NavController) {
                         Text(selectedPhoto ?: "Tidak ada file yang dipilih")
                     }
 
-                    Row(modifier = Modifier .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        // End date
+                    // End Date
+                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
+                        Text(text = "Tanggal Berakhir (DD/MM/YYYY)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
                         OutlinedTextField(
+                            value = selectedDate,
+                            onValueChange = {},
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                            placeholder = { Text("DD/MM/YYYY") },
+                            enabled = false,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF008753),
-                                unfocusedBorderColor = Color.Gray,
+                                unfocusedBorderColor = Color(0xFF008753),
+                                unfocusedPlaceholderColor = Color(0xFF008753),
                                 cursorColor = Color(0xFF008753),
-                                focusedLabelColor = Color(0xFF008753),
-                                unfocusedLabelColor = Color.Gray
                             ),
-                            value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(endDateTime.time),
-                            onValueChange = { /* handle change */ },
-                            label = { Text("Tanggal Berakhir (DD/MM/YYYY)") },
-                            leadingIcon = { Icon(imageVector = Icons.Default.DateRange, contentDescription = null) },
-                            placeholder = { Text("25/11/2022") }
+                            trailingIcon = {
+                                IconButton(onClick = { datePickerDialog.show() }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Select Date"
+                                    )
+                                }
+                            }
                         )
                     }
 
                     // End time
-                    Row(modifier = Modifier.padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
+                        Text(text = "Waktu Berakhir (Format 24 Jam)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
+
                         OutlinedTextField(
+                            value = selectedTime,
+                            onValueChange = {},
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                            placeholder = { Text("HH:MM") },
+                            enabled = false,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF008753),
-                                unfocusedBorderColor = Color.Gray,
+                                unfocusedBorderColor = Color(0xFF008753),
+                                unfocusedPlaceholderColor = Color(0xFF008753),
                                 cursorColor = Color(0xFF008753),
-                                focusedLabelColor = Color(0xFF008753),
-                                unfocusedLabelColor = Color.Gray
                             ),
-                            value = endHour,
-                            onValueChange = { endHour = it },
-                            label = { Text("Waktu Berakhir (HH:MM)") },
-                            placeholder = { Text("e.g., 14:00") }
+                            trailingIcon = {
+                                IconButton(onClick = { timePickerDialog.show() }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Select Time"
+                                    )
+                                }
+                            }
                         )
-                        IconButton(onClick = { /* handle time picker */ }) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Pilih Waktu")
-                        }
                     }
 
                     Text(

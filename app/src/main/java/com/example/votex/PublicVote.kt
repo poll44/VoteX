@@ -12,12 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -37,6 +42,8 @@ fun PublicVotePage(navController: NavController) {
     var userEmail: String = ""
     var password: String = ""
     var userId: String = ""
+    var options by remember { mutableStateOf(mutableListOf("", "", "")) }
+
     if (!LocalInspectionMode.current) {
         auth = Firebase.auth
         val currentUser = auth.currentUser
@@ -84,6 +91,27 @@ fun PublicVotePage(navController: NavController) {
             .clip(RoundedCornerShape(15.dp))
             .background(Color(0xFFFFFFFF))
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 5.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(Color(0xFFFFFFFF))
+        ) {
+            Image(
+                painter = painterResource(R.drawable.convomfs_on_twitter),
+                contentDescription = null,
+            )
+        }
+        Row(modifier = Modifier .padding(10.dp) .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Survei ini dilakukan untuk dijadikan tugas akhir di Jurusan Tataboga Universitas Bulan Sabit Menyala. Mohon untuk dijawab tanpa ada paksaan dari pihak manapun. ",
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
+                textAlign = TextAlign.Justify
+            )
+        }
 
     }
 }
+
