@@ -55,7 +55,7 @@ private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
 @Composable
-fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
+fun HomePage(navController: NavController) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var userEmail: String = ""
     var userId: String = ""
@@ -207,7 +207,7 @@ fun HomePage(navController: NavController, modifier: Modifier = Modifier) {
                         ) {
                             Text(text = "PIN : 1234", color = Color.Gray)
                             Button(
-                                onClick = { /* Handle Hasil button click */ },
+                                onClick = { navController.navigate("vote") },
                                 colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                 shape = RoundedCornerShape(50)
                             ) {

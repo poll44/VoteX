@@ -1,5 +1,6 @@
 package com.example.votex
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,14 +55,10 @@ import com.google.firebase.database.database
 private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CredentialPage(navController: NavController) {
     var selectedOption by remember { mutableStateOf("") }
-    val options = listOf("NIM", "NIK", "Passport ID")
     var maxInput by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
     var isChecked1 by remember { mutableStateOf(false) }
     var isChecked2 by remember { mutableStateOf(false) }
     var isChecked3 by remember { mutableStateOf(false) }
@@ -145,71 +143,62 @@ fun CredentialPage(navController: NavController) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = isChecked1,
-                        onCheckedChange = { isChecked1 = it}
-                        )
-                    Text(text = "Email", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp))
+                        onCheckedChange = { isChecked1 = it }
+                    )
+                    Text(
+                        text = "Email",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(10.dp)
+                    )
                 }
+                var isContentVisible by remember { mutableStateOf(false) }
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        // Checkbox with label
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = isChecked2,
-                                onCheckedChange = { isChecked2 = it }
-                            )
-                            Text(
-                                text = "Nomor Identitas", fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp)
-                            )
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = isChecked2,
+                            onCheckedChange = { isChecked2 = it }
+                        )
+                        Text(
+                            text = "Nomor Identitas",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                        if (isChecked2) {
+                            IconButton(onClick = { isContentVisible = !isContentVisible }) {
+                                Icon(
+                                    imageVector = if (isContentVisible) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = "Favorite"
+                                )
+                            }
                         }
+                    }
 
-                        if(isChecked2) {
-
-                        // Dropdown Menu
-                        ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = { expanded = !expanded }
-                        ) {
+                    AnimatedVisibility(visible = isContentVisible) {
+                        Column {
+                            Spacer(modifier = Modifier.height(8.dp))
                             OutlinedTextField(
                                 value = selectedOption,
                                 onValueChange = { selectedOption = it },
-                                readOnly = true,
                                 label = { Text("What do you want others to see") },
                                 placeholder = { Text("Example: NIM, NIK, Passport ID") },
                                 modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                                }
                             )
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                options.forEach { option ->
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            selectedOption = option
-                                            expanded = false
-                                        },
-                                        text = { Text(option) }
-                                    )
-                                }
-                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlinedTextField(
+                                value = maxInput,
+                                onValueChange = { maxInput = it },
+                                label = { Text("Max input") },
+                                placeholder = { Text("Example: 69") },
+                                modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
+                            )
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Max Input
-                        OutlinedTextField(
-                            value = maxInput,
-                            onValueChange = { maxInput = it },
-                            label = { Text("Max input") },
-                            placeholder = { Text("Example: 69") },
-                            modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
-                        )
                     }
                 }
+
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = isChecked3,

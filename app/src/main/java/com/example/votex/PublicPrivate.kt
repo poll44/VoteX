@@ -60,14 +60,13 @@ fun PublicPrivatePage(navController: NavController) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            selectedPhoto = uri.toString() // Simpan URI gambar
+            selectedPhoto = uri.toString()
         }
     }
     var isDialogOpen by remember { mutableStateOf(false) }
     var voteTitle by remember { mutableStateOf("") }
     var voteDescription by remember { mutableStateOf("") }
     var voteType by remember { mutableStateOf(VoteType.Public) }
-
     var options by remember { mutableStateOf(mutableListOf("", "", "")) }
     var votePin by remember { mutableStateOf("") }
     var isOptionOpen by remember { mutableStateOf(false) }
@@ -111,7 +110,6 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                     }
                 }
-
                 Text(text = "Buatlah voting Anda sendiri", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             }
 
@@ -136,7 +134,7 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                         Text(
                             text = "Publik",
-                            color = if (voteType == VoteType.Public) Color(0xFF008753) else Color.Gray // Change color based on selection
+                            color = if (voteType == VoteType.Public) Color(0xFF008753) else Color.Gray
                         )
 
                         RadioButton(
@@ -149,13 +147,12 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                         Text(
                             text = "Privat",
-                            color = if (voteType == VoteType.Private) Color(0xFF008753) else Color.Gray // Change color based on selection
+                            color = if (voteType == VoteType.Private) Color(0xFF008753) else Color.Gray
                         )
                     }
 
                     Row(modifier = Modifier .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        // Header
                         OutlinedTextField(
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF008753),
@@ -175,7 +172,6 @@ fun PublicPrivatePage(navController: NavController) {
 
                     Row(modifier = Modifier.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        // Description
                         OutlinedTextField(
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = Color(0xFF008753),
@@ -190,7 +186,7 @@ fun PublicPrivatePage(navController: NavController) {
                             placeholder = { Text("contoh: Ini merupakan...") },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(min = 100.dp) // Set a minimum height for the text field
+                                .heightIn(min = 100.dp)
                         )
                     }
 
@@ -198,17 +194,16 @@ fun PublicPrivatePage(navController: NavController) {
                         modifier = Modifier.padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Tombol Pilih Foto
                         Button(
                             onClick = {
-                                launcher.launch("image/*") // Memfilter hanya file gambar
+                                launcher.launch("image/*")
                             },
                             colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                             shape = RoundedCornerShape(50)
                         ) {
                             Text("Pilih Foto")
                         }
-                        Spacer(modifier = Modifier.width(8.dp)) // Spacer antara tombol dan teks
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = selectedPhoto ?: "Tidak ada file yang dipilih",
                             modifier = Modifier.padding(start = 8.dp),
@@ -217,7 +212,6 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                     }
 
-                    // End Date
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         Text(text = "Tanggal Berakhir (DD/MM/YYYY)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
                         OutlinedTextField(
@@ -243,10 +237,8 @@ fun PublicPrivatePage(navController: NavController) {
                         )
                     }
 
-                    // End time
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         Text(text = "Waktu Berakhir (Format 24 Jam)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
-
                         OutlinedTextField(
                             value = selectedTime,
                             onValueChange = {},
@@ -297,7 +289,6 @@ fun PublicPrivatePage(navController: NavController) {
                             )
                         }
 
-                        // Tombol untuk menambah opsi baru
                         Row(
                             modifier = Modifier.padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -318,7 +309,7 @@ fun PublicPrivatePage(navController: NavController) {
 
                     if(isOptionOpen) {
                         AlertDialog(
-                            onDismissRequest = { isOptionOpen = false }, // Menutup dialog saat disentuh di luar
+                            onDismissRequest = { isOptionOpen = false },
                             confirmButton = {
                                 TextButton(onClick = { isOptionOpen = false }) {
                                     Text("OK")

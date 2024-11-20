@@ -1,6 +1,7 @@
 package com.example.votex
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -17,15 +18,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -39,11 +43,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
@@ -59,8 +63,7 @@ private lateinit var database: FirebaseDatabase
 @Composable
 fun ElectionPage(navController: NavController) {
     var selectedDate by remember { mutableStateOf("") }
-    var hour by remember { mutableStateOf("") }
-    var minute by remember { mutableStateOf("") }
+    var selectedTime by remember { mutableStateOf("") }
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val datePickerDialog = DatePickerDialog(
@@ -71,6 +74,15 @@ fun ElectionPage(navController: NavController) {
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),
         calendar.get(Calendar.DAY_OF_MONTH)
+    )
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            selectedTime = String.format("%02d:%02d", hourOfDay, minute)
+        },
+        calendar.get(java.util.Calendar.HOUR_OF_DAY),
+        calendar.get(java.util.Calendar.MINUTE),
+        true
     )
     val mContext = LocalContext.current
     var judul: String = ""
@@ -83,77 +95,84 @@ fun ElectionPage(navController: NavController) {
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            item {
+                Spacer(modifier = Modifier.height(40.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Color(0xFFFFFFFF))
-            ) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                        .clip(RoundedCornerShape(15.dp)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Color(0xFFFFFFFF))
                 ) {
-                    IconButton(
-                        onClick = { navController.navigate("credential") },
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                            .clip(RoundedCornerShape(15.dp)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = "back Icon",
-                            tint = Color(0xFF008753),
-                            modifier = Modifier.fillMaxSize()
+                        IconButton(
+                            onClick = { navController.navigate("credential") },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowLeft,
+                                contentDescription = "back Icon",
+                                tint = Color(0xFF008753),
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        Image(
+                            painter = painterResource(R.drawable.group_166),
+                            contentDescription = null,
+                            modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
-                    Image(
-                        painter = painterResource(R.drawable.group_166),
-                        contentDescription = null,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
                 }
             }
 
-            Text(text = "Detail Pemilu", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Color(0xFFFFFFFF))
-            ) {
-                Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                    Text(
-                        text = "Header",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp)
-                            .padding(horizontal = 20.dp, vertical = 5.dp),
-                        value = judul,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF008753),
-                            unfocusedBorderColor = Color(0xFF008753),
-                            cursorColor = Color(0xFF008753),
-                        ),
-                        onValueChange = { newText -> judul = newText }
-                    )
-                }
-                Column(modifier = Modifier.padding(vertical = 10.dp)) {
+            item {
+                Text(
+                    text = "Detail Pemilu",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Color(0xFFFFFFFF))
+                ) {
+                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
+                        Text(
+                            text = "Header",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 20.dp)
+                        )
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                                .padding(horizontal = 20.dp, vertical = 5.dp),
+                            value = judul,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF008753),
+                                unfocusedBorderColor = Color(0xFF008753),
+                                cursorColor = Color(0xFF008753),
+                            ),
+                            onValueChange = { newText -> judul = newText }
+                        )
+                    }
+
                     Text(
                         text = "Deskripsi",
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp)
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
                     )
                     OutlinedTextField(
                         modifier = Modifier
@@ -165,12 +184,14 @@ fun ElectionPage(navController: NavController) {
                             focusedBorderColor = Color(0xFF008753),
                             unfocusedBorderColor = Color(0xFF008753),
                             cursorColor = Color(0xFF008753),
-                        ),
-                        onValueChange = { newText -> deskripsi = newText }
+                            ),
+                            onValueChange = { newText -> deskripsi = newText })
+
+                    Text(
+                        text = "End date (DD/MM/YYYY)",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
                     )
-                }
-                Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                    Text(text = "End date (DD/MM/YYYY)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
                     OutlinedTextField(
                         value = selectedDate,
                         onValueChange = {},
@@ -182,7 +203,7 @@ fun ElectionPage(navController: NavController) {
                             unfocusedBorderColor = Color(0xFF008753),
                             unfocusedPlaceholderColor = Color(0xFF008753),
                             cursorColor = Color(0xFF008753),
-                        ),
+                            ),
                         trailingIcon = {
                             IconButton(onClick = { datePickerDialog.show() }) {
                                 Icon(
@@ -192,135 +213,179 @@ fun ElectionPage(navController: NavController) {
                             }
                         }
                     )
-                }
 
-                Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                    Text(text = "End time (0-24 format)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 20.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        OutlinedTextField(
-                            value = hour,
-                            onValueChange = {
-                                if (it.length <= 2 && it.all { char -> char.isDigit() }) {
-                                    val hourValue = it.toIntOrNull() ?: 0
-                                    if (hourValue in 0..23) hour = it
-                                }
-                            },
-                            modifier = Modifier.weight(1f).padding(horizontal = 20.dp),
-                            placeholder = { Text("hour") },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color(0xFF008753),
-                                unfocusedBorderColor = Color(0xFF008753),
-                                unfocusedPlaceholderColor = Color(0xFF008753),
-                                cursorColor = Color(0xFF008753),
+                    Text(
+                        text = "Waktu Berakhir (Format 24 Jam)",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
+                    )
+                    OutlinedTextField(
+                        value = selectedTime,
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                        placeholder = { Text("HH:MM") },
+                        enabled = false,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color(0xFF008753),
+                            unfocusedBorderColor = Color(0xFF008753),
+                            unfocusedPlaceholderColor = Color(0xFF008753),
+                            cursorColor = Color(0xFF008753),
                             ),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                        )
-                        Text(":")
-                        OutlinedTextField(
-                            value = minute,
-                            onValueChange = {
-                                if (it.length <= 2 && it.all { char -> char.isDigit() }) {
-                                    val minuteValue = it.toIntOrNull() ?: 0
-                                    if (minuteValue in 0..59) minute = it
-                                }
-                            },
-                            modifier = Modifier.weight(1f).padding(horizontal = 20.dp),
-                            placeholder = { Text("minutes") },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color(0xFF008753),
-                                unfocusedBorderColor = Color(0xFF008753),
-                                unfocusedPlaceholderColor = Color(0xFF008753),
-                                cursorColor = Color(0xFF008753),
-                            ),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                        )
-                    }
-                }
+                        trailingIcon = {
+                            IconButton(onClick = { timePickerDialog.show() }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Select Time"
+                                )
+                            }
+                        }
+                    )
 
-                var isContentVisible by remember { mutableStateOf(false) }
+                    var isContentVisible1 by remember { mutableStateOf(false) }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { isContentVisible = !isContentVisible },
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 10.dp)
                     ) {
-                        Text(if (isContentVisible) "Hide Candidate Form" else "Show Candidate Form")
-                    }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "Candidate 1", fontWeight = FontWeight.Bold)
+                            IconButton( onClick = {isContentVisible1 = !isContentVisible1}) {
+                                Icon(
+                                    imageVector = if (isContentVisible1) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = "Favorite"
+                                )
+                            }
+                        }
 
-                    // Content Area
-                    AnimatedVisibility(visible = isContentVisible) {
-                        Column {
-                            Spacer(modifier = Modifier.height(8.dp))
+                        AnimatedVisibility(visible = isContentVisible1) {
+                            Column {
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Team Alias TextField
-                            var teamAlias by remember { mutableStateOf("") }
-                            OutlinedTextField(
-                                value = teamAlias,
-                                onValueChange = { teamAlias = it },
-                                label = { Text("Candidate team alias") },
-                                placeholder = { Text("example: Amin, Pragib, GAMA") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                var teamAlias by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = teamAlias,
+                                    onValueChange = { teamAlias = it },
+                                    label = { Text("Candidate team alias") },
+                                    placeholder = { Text("example: Amin, Pragib, GAMA") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Full Name TextField
-                            var fullName by remember { mutableStateOf("") }
-                            OutlinedTextField(
-                                value = fullName,
-                                onValueChange = { fullName = it },
-                                label = { Text("Candidate full name") },
-                                placeholder = { Text("for candidate more than one use comma to separate them") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                var fullName by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = fullName,
+                                    onValueChange = { fullName = it },
+                                    label = { Text("Candidate full name") },
+                                    placeholder = { Text("for candidate more than one use comma to separate them") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Motto TextField
-                            var motto by remember { mutableStateOf("") }
-                            OutlinedTextField(
-                                value = motto,
-                                onValueChange = { motto = it },
-                                label = { Text("Candidate motto") },
-                                placeholder = { Text("example: Semuanya untuk rakyat") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                var motto by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = motto,
+                                    onValueChange = { motto = it },
+                                    label = { Text("Candidate motto") },
+                                    placeholder = { Text("example: Semuanya untuk rakyat") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Photo Picker
-                            var selectedPhoto by remember { mutableStateOf("") }
-                            OutlinedButton(
-                                onClick = { /* TODO: Implement photo picker logic */ },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(if (selectedPhoto.isEmpty()) "Choose Photo" else selectedPhoto)
+                                var selectedPhoto by remember { mutableStateOf("") }
+                                OutlinedButton(
+                                    onClick = { /* TODO: Implement photo picker logic */ },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(if (selectedPhoto.isEmpty()) "Choose Photo" else selectedPhoto)
+                                }
                             }
                         }
                     }
-                }
 
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                    Button(
-                        onClick = {
-                            Toast.makeText(
-                            mContext,
-                            "Voting pemilu telah berhasil dibuat",
-                            Toast.LENGTH_SHORT).show()
-                            navController.navigate("home")
-                                  },
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
-                        shape = RoundedCornerShape(50)
+                    var isContentVisible2 by remember { mutableStateOf(false) }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 10.dp)
                     ) {
-                        Text(text = "Lanjut", color = Color.White)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "Candidate 2", fontWeight = FontWeight.Bold)
+                            IconButton( onClick = {isContentVisible2 = !isContentVisible2}) {
+                                Icon(
+                                    imageVector = if (isContentVisible2) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = "Favorite"
+                                )
+                            }
+                        }
+
+                        AnimatedVisibility(visible = isContentVisible2) {
+                            Column {
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                var teamAlias by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = teamAlias,
+                                    onValueChange = { teamAlias = it },
+                                    label = { Text("Candidate team alias") },
+                                    placeholder = { Text("example: Amin, Pragib, GAMA") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                var fullName by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = fullName,
+                                    onValueChange = { fullName = it },
+                                    label = { Text("Candidate full name") },
+                                    placeholder = { Text("for candidate more than one use comma to separate them") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                var motto by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = motto,
+                                    onValueChange = { motto = it },
+                                    label = { Text("Candidate motto") },
+                                    placeholder = { Text("example: Semuanya untuk rakyat") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                var selectedPhoto by remember { mutableStateOf("") }
+                                OutlinedButton(
+                                    onClick = { /* TODO: Implement photo picker logic */ },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(if (selectedPhoto.isEmpty()) "Choose Photo" else selectedPhoto)
+                                }
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                        Button(
+                            onClick = {
+                                Toast.makeText(
+                                    mContext,
+                                    "Voting pemilu telah berhasil dibuat",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                navController.navigate("home")
+                            },
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Text(text = "Lanjut", color = Color.White)
+                        }
                     }
                 }
             }
