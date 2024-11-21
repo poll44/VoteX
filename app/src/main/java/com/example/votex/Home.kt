@@ -207,7 +207,7 @@ fun HomePage(navController: NavController) {
                         ) {
                             Text(text = "PIN : 1234", color = Color.Gray)
                             Button(
-                                onClick = { navController.navigate("vote") },
+                                onClick = { navController.navigate("result") },
                                 colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                 shape = RoundedCornerShape(50)
                             ) {

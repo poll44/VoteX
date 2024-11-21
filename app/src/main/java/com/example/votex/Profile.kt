@@ -49,10 +49,15 @@ private lateinit var database: FirebaseDatabase
 @Composable
 fun ProfilePage(navController: NavController) {
     val email: String = ""
-    val userEmail: String = ""
+    var userEmail: String = ""
 
     if (!LocalInspectionMode.current){
         auth = Firebase.auth
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val email = currentUser.email.toString()
+            userEmail = email.substringBefore("@")
+        }
         database = Firebase.database
     }
 

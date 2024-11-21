@@ -3,7 +3,10 @@ package com.example.votex
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,8 +33,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -43,11 +45,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
@@ -62,6 +64,7 @@ private lateinit var database: FirebaseDatabase
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ElectionPage(navController: NavController) {
+    var selectedPhoto by remember { mutableStateOf<String?>(null) }
     var selectedDate by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -84,6 +87,13 @@ fun ElectionPage(navController: NavController) {
         calendar.get(java.util.Calendar.MINUTE),
         true
     )
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            selectedPhoto = uri.toString()
+        }
+    }
     val mContext = LocalContext.current
     var judul: String = ""
     var deskripsi: String = ""
@@ -295,12 +305,26 @@ fun ElectionPage(navController: NavController) {
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                var selectedPhoto by remember { mutableStateOf("") }
-                                OutlinedButton(
-                                    onClick = { /* TODO: Implement photo picker logic */ },
-                                    modifier = Modifier.fillMaxWidth()
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(if (selectedPhoto.isEmpty()) "Choose Photo" else selectedPhoto)
+                                    Button(
+                                        onClick = {
+                                            launcher.launch("image/*")
+                                        },
+                                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text("Pilih Foto")
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = selectedPhoto ?: "Tidak ada file yang dipilih",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             }
                         }
@@ -360,12 +384,26 @@ fun ElectionPage(navController: NavController) {
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                var selectedPhoto by remember { mutableStateOf("") }
-                                OutlinedButton(
-                                    onClick = { /* TODO: Implement photo picker logic */ },
-                                    modifier = Modifier.fillMaxWidth()
+                                Row(
+                                    modifier = Modifier.padding(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(if (selectedPhoto.isEmpty()) "Choose Photo" else selectedPhoto)
+                                    Button(
+                                        onClick = {
+                                            launcher.launch("image/*")
+                                        },
+                                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text("Pilih Foto")
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = selectedPhoto ?: "Tidak ada file yang dipilih",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
                                 }
                             }
                         }

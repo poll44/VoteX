@@ -136,11 +136,11 @@ fun CredentialPage(navController: NavController) {
                 ) {
                     Text(
                         text = "Untuk menjaga keamanan dan integritas setiap suara yang diberikan, pengguna diharuskan mengisi beberapa kredensial penting sebelum memberikan suara. Silakan periksa apa saja yang harus diisi oleh pengguna.",
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
+                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
                         textAlign = TextAlign.Justify
                     )
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 15.dp)) {
                     Checkbox(
                         checked = isChecked1,
                         onCheckedChange = { isChecked1 = it }
@@ -156,7 +156,7 @@ fun CredentialPage(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 15.dp)) {
                         Checkbox(
                             checked = isChecked2,
                             onCheckedChange = { isChecked2 = it }
@@ -182,16 +182,16 @@ fun CredentialPage(navController: NavController) {
                             OutlinedTextField(
                                 value = selectedOption,
                                 onValueChange = { selectedOption = it },
-                                label = { Text("What do you want others to see") },
-                                placeholder = { Text("Example: NIM, NIK, Passport ID") },
+                                label = { Text("Pilih jenis nomor identitas") },
+                                placeholder = { Text("Contoh: NIM, NIK, ID paspor") },
                                 modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             OutlinedTextField(
                                 value = maxInput,
                                 onValueChange = { maxInput = it },
-                                label = { Text("Max input") },
-                                placeholder = { Text("Example: 69") },
+                                label = { Text("Maksimal input") },
+                                placeholder = { Text("Contoh: 16") },
                                 modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
                             )
                         }
@@ -199,21 +199,21 @@ fun CredentialPage(navController: NavController) {
                 }
 
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 15.dp)) {
                     Checkbox(
                         checked = isChecked3,
                         onCheckedChange = { isChecked3 = it}
                     )
                     Text(text = "Nama Lengkap", modifier = Modifier.padding(10.dp), fontWeight = FontWeight.Bold)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 15.dp)) {
                     Checkbox(
                         checked = isChecked4,
                         onCheckedChange = { isChecked4 = it}
                     )
                     Text(text = "Tanggal Lahir", modifier = Modifier.padding(10.dp), fontWeight = FontWeight.Bold)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 15.dp)) {
                     Checkbox(
                         checked = isChecked5,
                         onCheckedChange = { isChecked5 = it}

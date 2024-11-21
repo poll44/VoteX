@@ -136,12 +136,16 @@ fun ElectionVotePage(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
-                        .clip(RoundedCornerShape(15.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .background(Color(0xFFFFFFFF))
-                        .border(5.dp, Color(0xFF008753))
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFF008753),
+                            shape = RoundedCornerShape(20.dp)
+                        )
                 ) {
-                    Text(text = "Kandidat 1", fontWeight = FontWeight.Bold, color = Color(0xFF008753))
-                    Box(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
+                    Text(text = "Kandidat 1", fontWeight = FontWeight.Bold, color = Color(0xFF008753), modifier = Modifier.padding(15.dp), fontSize = 20.sp)
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
                         Image(
                             painter = painterResource(id = R.drawable.image_20),
                             contentDescription = "Gambar Bubur",
@@ -155,18 +159,6 @@ fun ElectionVotePage(navController: NavController) {
 
                     Spacer(modifier = Modifier.height(15.dp))
 
-                    Text(
-                        text = "Nama lain tim kandidat : ",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Text(
-                        text = "AFB TEAM",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "Nama Tim Kandidat : ",
                         fontWeight = FontWeight.Bold,
@@ -216,12 +208,16 @@ fun ElectionVotePage(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
-                        .clip(RoundedCornerShape(15.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .background(Color(0xFFFFFFFF))
-                        .border(5.dp, Color(0xFF008753))
+                        .border(
+                            width = 2.dp,
+                            color = Color(0xFF008753),
+                            shape = RoundedCornerShape(20.dp)
+                        )
                 ) {
-                    Text(text = "Kandidat 2", fontWeight = FontWeight.Bold, color = Color(0xFF008753))
-                    Box(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
+                    Text(text = "Kandidat 2", fontWeight = FontWeight.Bold, color = Color(0xFF008753), modifier = Modifier.padding(15.dp), fontSize = 20.sp)
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
                         Image(
                             painter = painterResource(id = R.drawable.image_21),
                             contentDescription = "Gambar Bubur",
@@ -236,22 +232,11 @@ fun ElectionVotePage(navController: NavController) {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        text = "Nama lain tim kandidat : ",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Text(
-                        text = "AFB TEAM",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
                         text = "Nama Tim Kandidat : ",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
+
                     Text(
                         text = "SHRRRRRRREX",
                         modifier = Modifier.padding(horizontal = 16.dp)

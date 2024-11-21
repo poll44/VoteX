@@ -286,7 +286,7 @@ fun SearchPage(navController: NavController) {
                                     colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                     shape = RoundedCornerShape(50)
                                 ) {
-                                    Text(text = "Hasil", color = Color.White)
+                                    Text(text = "Vote", color = Color.White)
                                 }
                             }
                         }
@@ -417,7 +417,7 @@ fun SearchPage(navController: NavController) {
                                     colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                     shape = RoundedCornerShape(50)
                                 ) {
-                                    Text(text = "Hasil", color = Color.White)
+                                    Text(text = "Vote", color = Color.White)
                                 }
                             }
                         }
@@ -608,7 +608,7 @@ fun SearchPage(navController: NavController) {
                                     text = {
                                         Column(modifier = Modifier.fillMaxWidth()) {
                                             Text(
-                                                text = "Before you proceed to the voting process, you must fill in some of your identity as this is important to ensure the security and validity of each vote cast. This identity will be automatically verified to prevent any forgery or duplication of votes.",
+                                                text = "Sebelum Anda melanjutkan ke proses pemungutan suara, Anda harus mengisi beberapa identitas Anda, karena ini penting untuk memastikan keamanan dan keabsahan setiap suara yang diberikan. Identitas ini akan diverifikasi secara otomatis untuk mencegah pemalsuan atau duplikasi suara.",
                                                 fontSize = 12.sp,
                                                 color = Color.Gray,
                                                 modifier = Modifier.padding(bottom = 16.dp)
@@ -617,8 +617,8 @@ fun SearchPage(navController: NavController) {
                                             OutlinedTextField(
                                                 value = activeEmail,
                                                 onValueChange = { activeEmail = it },
-                                                label = { Text("Active email") },
-                                                placeholder = { Text("example: username@gmail.com") },
+                                                label = { Text("Alamat Email") },
+                                                placeholder = { Text("Contoh: username@gmail.com") },
                                                 modifier = Modifier.fillMaxWidth(),
                                                 singleLine = true
                                             )
@@ -627,8 +627,8 @@ fun SearchPage(navController: NavController) {
                                             OutlinedTextField(
                                                 value = fullName,
                                                 onValueChange = { fullName = it },
-                                                label = { Text("Full name") },
-                                                placeholder = { Text("example: Username bin Khodam") },
+                                                label = { Text("Nama Lengkap") },
+                                                placeholder = { Text("Contoh: Username bin Khodam") },
                                                 modifier = Modifier.fillMaxWidth(),
                                                 singleLine = true
                                             )
@@ -636,8 +636,8 @@ fun SearchPage(navController: NavController) {
 
                                             OutlinedTextField(
                                                 value = birthDate,
-                                                onValueChange = { /* Read-only field */ },
-                                                label = { Text("Birth date") },
+                                                onValueChange = { },
+                                                label = { Text("Tanggal lahir") },
                                                 placeholder = { Text("25/11/2022") },
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -647,35 +647,23 @@ fun SearchPage(navController: NavController) {
                                                     focusedBorderColor = Color(0xFF008753),
                                                     unfocusedBorderColor = Color(0xFF008753),
                                                     cursorColor = Color(0xFF008753),
-                                                )
+                                                ),
+                                                trailingIcon = {
+                                                    IconButton(onClick = { datePickerDialog.show() }) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.DateRange,
+                                                            contentDescription = "Select Date"
+                                                        )
+                                                    }
+                                                }
                                             )
                                             Spacer(modifier = Modifier.height(8.dp))
 
                                             OutlinedTextField(
                                                 value = residence,
                                                 onValueChange = { residence = it },
-                                                label = { Text("Residence") },
-                                                placeholder = { Text("example: Jl. Gunung Harta No. 5") },
-                                                modifier = Modifier.fillMaxWidth(),
-                                                singleLine = true
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            OutlinedTextField(
-                                                value = faculty,
-                                                onValueChange = { faculty = it },
-                                                label = { Text("Faculty") },
-                                                placeholder = { Text("example: Fakultas Ilmu Komputer") },
-                                                modifier = Modifier.fillMaxWidth(),
-                                                singleLine = true
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            OutlinedTextField(
-                                                value = department,
-                                                onValueChange = { department = it },
-                                                label = { Text("Department") },
-                                                placeholder = { Text("example: Teknik Informatika") },
+                                                label = { Text("Alamat") },
+                                                placeholder = { Text("Contoh: Jl. Gunung Harta No. 5") },
                                                 modifier = Modifier.fillMaxWidth(),
                                                 singleLine = true
                                             )
@@ -701,7 +689,7 @@ fun SearchPage(navController: NavController) {
                                     colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                     shape = RoundedCornerShape(50)
                                 ) {
-                                    Text(text = "Hasil", color = Color.White)
+                                    Text(text = "Vote", color = Color.White)
                                 }
                             }
                         }
