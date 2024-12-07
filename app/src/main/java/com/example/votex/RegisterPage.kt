@@ -37,10 +37,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.votex.R
+import com.example.votex.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 private lateinit var auth: FirebaseAuth
-
+private lateinit var database: FirebaseDatabase
 @Composable
 fun RegisterPage(navController: NavController) {
     val mContext = LocalContext.current
@@ -48,16 +50,47 @@ fun RegisterPage(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
 
+    // Fungsi untuk melakukan registrasi
     fun signup(email: String, password: String) {
         auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+
+        if (password != repeatPassword) {
+            Toast.makeText(mContext, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(ContentValues.TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser?.email
-                    Toast.makeText(mContext, "User registered: $user", Toast.LENGTH_SHORT).show()
-                    navController.navigate("home")
+                    // Mengambil user ID dari FirebaseAuth
+                    val userId = auth.currentUser?.uid
+
+                    // Membuat data pengguna baru dengan nilai default
+                    val newUser = User(
+                        profilePhoto = "",
+                        name = "",
+                        email = email,
+                        password = password,
+                        birthDate = "",
+                        place = "",
+                        hasVotedAt = emptyList()
+                    )
+
+                    // Menyimpan data user ke Firebase Realtime Database
+                    userId?.let {
+                        database.reference.child("users").child(it).setValue(newUser)
+                            .addOnCompleteListener { dbTask ->
+                                if (dbTask.isSuccessful) {
+                                    Toast.makeText(mContext, "User registered: $email", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("created") // Arahkan ke halaman utama setelah registrasi sukses
+                                } else {
+                                    Toast.makeText(mContext, "Failed to save user data: ${dbTask.exception}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                    }
                 } else {
+                    // Menangani error saat pendaftaran gagal
                     Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(mContext, "Registration failed: ${task.exception}", Toast.LENGTH_SHORT).show()
                 }

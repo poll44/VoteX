@@ -1,10 +1,10 @@
 package com.example.votex
 
-import androidx.compose.foundation.BorderStroke
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,29 +18,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,27 +53,53 @@ private lateinit var database: FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfilePage(navController: NavController) {
-    var email: String = ""
-    var userEmail: String = ""
-    var password: String = ""
-    var userId: String = ""
-    val mContext = LocalContext.current
+fun ProfilePage(navController: NavController) {
+    var stringEmail: String = ""
+    var uidAuth: String = ""
+    var userName by remember { mutableStateOf("") }
+    var userBirthDate by remember { mutableStateOf("") }
+    var userPlace by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
-    if (!LocalInspectionMode.current){
+    if (!LocalInspectionMode.current) {
         auth = Firebase.auth
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            email = currentUser.email.toString()
-            userEmail = email.substringBefore("@")
-            password = currentUser.providerId.toString()
-
+            uidAuth = currentUser.uid
+            stringEmail = currentUser.email ?: ""
         }
         database = Firebase.database
-    }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
-    ) {
+        // Referensi ke Realtime Database
+        val userRef = database.getReference("users").child(uidAuth)
+
+        // Ambil data dari Realtime Database
+        userRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val fetchedUser = snapshot.getValue(User::class.java)
+                    fetchedUser?.let {
+                        userName = it.name
+                        userBirthDate = it.birthDate
+                        userPlace = it.place
+                        password = it.password
+
+                        // Log hasil untuk debugging
+                        Log.d("User Data", "Name: $userName, BirthDate: $userBirthDate, Place: $userPlace, Password: $password")
+                    }
+                } else {
+                    Log.w("User Data", "No data found for UID: $uidAuth")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("User Data", "Error getting data", exception)
+            }
+    }
+    fun logout() {
+        auth.signOut() // Keluar dari akun Firebase
+        navController.navigate("login") // Arahkan kembali ke halaman login
+    }
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))) {
         Column(
             modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
         ) {
@@ -101,7 +122,7 @@ fun EditProfilePage(navController: NavController) {
                             color = Color(0xFF008753)
                         )
                         Text(
-                            text = "Hi, $userEmail"
+                            text = "Hi, ${userName ?: "User"}"
                         )
                     }
                     Image(
@@ -110,8 +131,8 @@ fun EditProfilePage(navController: NavController) {
                     )
                 }
             }
-            Text(text = "Edit Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
-            Column (
+            Text(text = "Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
@@ -131,6 +152,8 @@ fun EditProfilePage(navController: NavController) {
                             .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = CircleShape)
                     )
                 }
+
+                // Nama
                 Text(
                     text = "Nama",
                     fontWeight = FontWeight.Bold,
@@ -141,7 +164,8 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = userEmail,
+                    value = userName,
+                    enabled = false, // Membuat field tidak bisa diubah
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
                         unfocusedBorderColor = Color.Gray,
@@ -149,6 +173,8 @@ fun EditProfilePage(navController: NavController) {
                     ),
                     onValueChange = { }
                 )
+
+                // Email
                 Text(
                     text = "Email",
                     fontWeight = FontWeight.Bold,
@@ -159,14 +185,17 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = email,
+                    value = stringEmail,
+                    enabled = false, // Membuat field tidak bisa diubah
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
                 )
+
+                // Password
                 Text(
                     text = "Password",
                     fontWeight = FontWeight.Bold,
@@ -177,15 +206,18 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "12345678",
+                    value = password, // Sesuaikan dengan tanggal lahir yang sebenarnya
+                    enabled = false,
                     visualTransformation = PasswordVisualTransformation(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
                 )
+
+                // Tanggal lahir
                 Text(
                     text = "Tanggal lahir",
                     fontWeight = FontWeight.Bold,
@@ -196,14 +228,17 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "12/12/2024",
+                    value = "$userBirthDate", // Sesuaikan dengan tanggal lahir yang sebenarnya
+                    enabled = false, // Membuat field tidak bisa diubah
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
                 )
+
+                // Kota/Wilayah
                 Text(
                     text = "Kota/Wilayah",
                     fontWeight = FontWeight.Bold,
@@ -214,10 +249,11 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "Malang",
+                    value = "$userPlace", // Sesuaikan dengan kota atau wilayah yang sebenarnya
+                    enabled = false, // Membuat field tidak bisa diubah
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color(0xFF008753),
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -225,20 +261,26 @@ fun EditProfilePage(navController: NavController) {
 
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
                     Button(
-                        onClick = { navController.navigate("Profile") },
+                        onClick = { logout() },
+                        modifier = Modifier.align(Alignment.Center),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text("Logout", color = Color.White)
+                    }
+                    Button(
+                        onClick = { navController.navigate("editProfile") },
                         modifier = Modifier.align(Alignment.BottomEnd),
                         colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                         shape = RoundedCornerShape(50)
                     ) {
-                        Text(text = "Simpan", color = Color.White)
+                        Text(text = "Ubah", color = Color.White)
                     }
+
                 }
             }
         }
 
-        /**
-         * Bottom Navigation Bar
-         */
+        // Bottom Navigation Bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -257,7 +299,7 @@ fun EditProfilePage(navController: NavController) {
                     .clip(RoundedCornerShape(15.dp))
             ) {
                 IconButton(
-                    onClick = {navController.navigate("home")},
+                    onClick = {navController.navigate("created")},
                 ) {
                     Image(
                         painter = painterResource(R.drawable.vector),

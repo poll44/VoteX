@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.votex.R
 import com.google.firebase.auth.FirebaseAuth
 
 private lateinit var auth: FirebaseAuth
@@ -62,7 +60,7 @@ fun LoginPage(navController: NavController) {
                         "Logged in as $user",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navController.navigate("home")
+                    navController.navigate("created")
                 } else {
                     Log.w(ContentValues.TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(

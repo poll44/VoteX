@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +41,7 @@ private lateinit var auth: FirebaseAuth
 private lateinit var database: FirebaseDatabase
 
 @Composable
-fun ResultPage(navController: NavController) {
+fun ResultPage(navController: NavController, unicId: String?) {
 
     if (!LocalInspectionMode.current) {
         auth = Firebase.auth
@@ -76,7 +75,7 @@ fun ResultPage(navController: NavController) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(
-                            onClick = { navController.navigate("home") },
+                            onClick = { navController.navigate("search") },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowLeft,

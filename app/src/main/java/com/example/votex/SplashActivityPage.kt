@@ -32,7 +32,7 @@ class SplashActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             VoteXTheme {
-                SplashScreen()
+                SplashActivityPage()
             }
         }
         getActionBar()?.hide()
@@ -40,7 +40,7 @@ class SplashActivity : ComponentActivity() {
 }
 
 @Composable
-fun SplashScreen() {
+fun SplashActivityPage() {
     val alpha = remember { Animatable(0f) }
     val context = LocalContext.current
 
@@ -80,6 +80,6 @@ fun SplashScreen() {
 @Composable
 fun PreviewSplashScreen() {
     VoteXTheme {
-        SplashScreen()
+        SplashActivityPage()
     }
 }

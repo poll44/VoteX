@@ -1,5 +1,6 @@
 package com.example.votex
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,6 +26,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,18 +53,31 @@ private lateinit var database: FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfilePage(navController: NavController) {
-    val email: String = ""
-    var userEmail: String = ""
+fun EditProfilePage(navController: NavController) {
+    var userName by remember { mutableStateOf("") }
+    var stringEmail by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
 
-    if (!LocalInspectionMode.current){
-        auth = Firebase.auth
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val email = currentUser.email.toString()
-            userEmail = email.substringBefore("@")
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+        stringEmail = currentUser.email ?: ""
+        LaunchedEffect(key1 = currentUser.uid) {
+            val database = FirebaseDatabase.getInstance()
+            val userRef = database.getReference("users").child(currentUser.uid)
+            userRef.get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val fetchedUser = snapshot.getValue(User::class.java)
+                    fetchedUser?.let {
+                        userName = it.name ?: ""
+                        birthDate = it.birthDate ?: ""
+                        city = it.place ?: ""
+                        password = it.password
+                    }
+                }
+            }
         }
-        database = Firebase.database
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
@@ -85,7 +104,7 @@ fun ProfilePage(navController: NavController) {
                             color = Color(0xFF008753)
                         )
                         Text(
-                            text = "Hi, $userEmail"
+                            text = "Hi, $userName"
                         )
                     }
                     Image(
@@ -94,7 +113,7 @@ fun ProfilePage(navController: NavController) {
                     )
                 }
             }
-            Text(text = "Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
+            Text(text = "Edit Your Profile", fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp))
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -125,14 +144,15 @@ fun ProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = userEmail,
+                    value = userName,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
                         unfocusedBorderColor = Color.Gray,
                         cursorColor = Color(0xFF008753),
                     ),
-                    onValueChange = { }
+                    onValueChange = { userName = it }
                 )
+
                 Text(
                     text = "Email",
                     fontWeight = FontWeight.Bold,
@@ -143,10 +163,11 @@ fun ProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = email,
+                    value = stringEmail,
+                    enabled = false,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color(0xFF008753),
+                        unfocusedBorderColor = Color.Gray,
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -161,11 +182,12 @@ fun ProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "12345678",
+                    value = password,
+                    enabled = false,
                     visualTransformation = PasswordVisualTransformation(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color(0xFF008753),
+                        unfocusedBorderColor = Color.Gray,
                         cursorColor = Color(0xFF008753),
                     ),
                     onValueChange = { }
@@ -180,13 +202,13 @@ fun ProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "12/12/2024",
+                    value = birthDate,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color(0xFF008753),
+                        unfocusedBorderColor = Color.Gray,
                         cursorColor = Color(0xFF008753),
                     ),
-                    onValueChange = { }
+                    onValueChange = {birthDate = it}
                 )
                 Text(
                     text = "Kota/Wilayah",
@@ -198,24 +220,51 @@ fun ProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .height(60.dp)
                         .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = "Malang",
+                    value = city,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color(0xFF008753),
+                        unfocusedBorderColor = Color.Gray,
                         cursorColor = Color(0xFF008753),
                     ),
-                    onValueChange = { }
+                    onValueChange = {city = it}
                 )
 
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                    Button(
-                        onClick = { navController.navigate("editProfile") },
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
-                        shape = RoundedCornerShape(50)
-                    ) {
-                        Text(text = "Ubah", color = Color.White)
-                    }
+                Button(
+                    onClick = {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser != null) {
+                            val database = FirebaseDatabase.getInstance()
+                            val userRef = database.getReference("users").child(currentUser.uid)
+
+                            // Update data pengguna di Firebase
+                            val updatedUserData = mapOf(
+                                "name" to userName, // userName yang baru
+                                "birthDate" to birthDate, // birthDate yang baru
+                                "place" to city, // city yang baru
+                                "email" to stringEmail
+                            )
+
+                            userRef.updateChildren(updatedUserData).addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    // Berhasil mengupdate, bisa lakukan navigasi kembali
+                                    navController.navigate("Profile")
+                                } else {
+                                    // Jika gagal, tampilkan error
+                                    task.exception?.let { exception ->
+                                        println("Error updating user data: $exception")
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Text(text = "Simpan", color = Color.White)
                 }
             }
         }
@@ -241,7 +290,7 @@ fun ProfilePage(navController: NavController) {
                     .clip(RoundedCornerShape(15.dp))
             ) {
                 IconButton(
-                    onClick = {navController.navigate("home")},
+                    onClick = {navController.navigate("created")},
                 ) {
                     Image(
                         painter = painterResource(R.drawable.vector),

@@ -1,8 +1,8 @@
 package com.example.votex
 
-import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,12 +27,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import java.text.SimpleDateFormat
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import java.util.*
+
+private lateinit var auth: FirebaseAuth
+private lateinit var database: FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PublicPrivatePage(navController: NavController) {
+fun PublicPrivateCreateVotePage(navController: NavController) {
     var selectedPhoto by remember { mutableStateOf<String?>(null) }
     var selectedDate by remember { mutableStateOf("") }
     var selectedTime by remember { mutableStateOf("") }
@@ -63,13 +70,107 @@ fun PublicPrivatePage(navController: NavController) {
             selectedPhoto = uri.toString()
         }
     }
+
     var isDialogOpen by remember { mutableStateOf(false) }
     var voteTitle by remember { mutableStateOf("") }
     var voteDescription by remember { mutableStateOf("") }
     var voteType by remember { mutableStateOf(VoteType.Public) }
-    var options by remember { mutableStateOf(mutableListOf("", "", "")) }
+    var options by remember { mutableStateOf(listOf("", "", "")) }
     var votePin by remember { mutableStateOf("") }
     var isOptionOpen by remember { mutableStateOf(false) }
+
+    // Inisialisasi auth dan database dengan LaunchedEffect
+    LaunchedEffect(Unit) {
+        auth = Firebase.auth
+        database = Firebase.database
+    }
+
+    // Fungsi untuk menyimpan vote
+    fun saveVote() {
+        val currentUser = auth.currentUser
+        if (!::auth.isInitialized) {
+            Toast.makeText(context, "Firebase Auth belum diinisialisasi.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (currentUser == null) {
+            Toast.makeText(context, "Anda belum masuk. Silakan login terlebih dahulu.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (voteTitle.isBlank() || voteDescription.isBlank()) {
+            Toast.makeText(context, "Mohon lengkapi judul dan deskripsi vote!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val filledOptions = options.filter { it.isNotBlank() }
+        if (filledOptions.size < 2) {
+            Toast.makeText(context, "Minimal 2 pilihan harus diisi!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Jika tipe vote adalah Public, pastikan votePin kosong
+        if (voteType == VoteType.Public && votePin.isNotEmpty()) {
+            Toast.makeText(context, "Vote publik tidak membutuhkan PIN!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val createdBy = currentUser.uid
+        val unicID = (10000..99999).random().toString()
+        val voteRef = database.getReference("votes")
+
+        // Cek apakah unicID sudah ada
+        voteRef.child(unicID).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                Toast.makeText(context, "Gagal menyimpan vote, coba lagi.", Toast.LENGTH_SHORT).show()
+                return@addOnSuccessListener
+            }
+
+            // Membuat opsi dengan key dinamis berdasarkan index dan nilai pilihan
+            val optionsMap = filledOptions.mapIndexed { index, option ->
+                val optionKey = "option${index + 1}" // Membuat key seperti "Option1", "Option2", dst.
+                optionKey to OptionDetail(
+                    pilihan = option,
+                    voters = mutableListOf() // Daftar UID pengguna yang memilih opsi ini
+                )
+            }.toMap()
+
+            val newVote = Vote(
+                selectedPhoto = selectedPhoto ?: "",
+                endDate = selectedDate,
+                endTime = selectedTime,
+                title = voteTitle,
+                description = voteDescription,
+                type = voteType.name,
+                options = optionsMap, // Menyimpan opsi yang sudah terisi
+                pin = if (voteType == VoteType.Private) votePin else "",
+                voteClosed = false,
+                unicID = unicID,
+                createdBy = createdBy // UID pengguna yang membuat voting
+            )
+
+            // Simpan vote baru ke Firebase
+            voteRef.child(unicID).setValue(newVote).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(context, "Vote berhasil disimpan!", Toast.LENGTH_SHORT).show()
+
+                    // Tambahkan unicID ke tabel users/{uid}/voteCreated
+                    val userVotesRef = database.getReference("users")
+                        .child(currentUser.uid)
+                        .child("voteCreated")
+                    userVotesRef.child(unicID).setValue(true).addOnCompleteListener { userTask ->
+                        if (userTask.isSuccessful) {
+                            Toast.makeText(context, "Vote ditambahkan ke profil pengguna!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Vote tersimpan, tetapi gagal diperbarui di profil pengguna: ${userTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Gagal menyimpan vote: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -94,7 +195,7 @@ fun PublicPrivatePage(navController: NavController) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(
-                            onClick = { navController.navigate("home") },
+                            onClick = { navController.navigate("created") },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowLeft,
@@ -270,13 +371,19 @@ fun PublicPrivatePage(navController: NavController) {
                             modifier = Modifier.padding(10.dp)
                         )
 
+                        Spacer(modifier = Modifier.height(8.dp))  // Memberikan jarak antar elemen
+
                         options.forEachIndexed { index, option ->
                             OutlinedTextField(
                                 value = option,
                                 onValueChange = { newValue ->
-                                    options[index] = newValue
+                                    options = options.toMutableList().apply {
+                                        this[index] = newValue
+                                    }
                                 },
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
                                 label = { Text("Pilihan") },
                                 placeholder = { Text("Masukkan Pilihan") },
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -288,6 +395,7 @@ fun PublicPrivatePage(navController: NavController) {
                                 )
                             )
                         }
+                        Spacer(modifier = Modifier.height(8.dp))  // Memberikan jarak sebelum tombol
 
                         Row(
                             modifier = Modifier.padding(10.dp),
@@ -295,8 +403,18 @@ fun PublicPrivatePage(navController: NavController) {
                         ) {
                             Button(
                                 onClick = {
-                                    options.add("")
-                                    isOptionOpen = true
+                                    try {
+                                        if (options.size < 6) {
+                                            options = options.toMutableList().apply {
+                                                add("")
+                                            }
+                                        } else {
+                                            Toast.makeText(context, "Maksimal 6 pilihan saja!", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("TambahPilihan", "Error saat menambahkan pilihan: ${e.message}")
+                                        e.printStackTrace()
+                                    }
                                 },
                                 colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
                                 shape = RoundedCornerShape(50)
@@ -304,7 +422,6 @@ fun PublicPrivatePage(navController: NavController) {
                                 Text("Tambah Pilihan")
                             }
                         }
-
                     }
 
                     if(isOptionOpen) {
@@ -369,9 +486,11 @@ fun PublicPrivatePage(navController: NavController) {
                             confirmButton = {
                                 Button(
                                     onClick = {
+                                        saveVote() // Menyimpan vote
                                         Toast.makeText(context, "Voting Telah Dibuat!", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("Home")
+                                        navController.navigate("created")
                                         isDialogOpen = false
+
                                     },
                                     colors = ButtonDefaults.buttonColors(Color(0xFF27AE60))
                                 ) {
@@ -388,7 +507,6 @@ fun PublicPrivatePage(navController: NavController) {
                             }
                         )
                     }
-
                 }
             }
         }
