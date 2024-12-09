@@ -136,7 +136,6 @@ fun CreatedHomePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
-                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -164,7 +163,6 @@ fun CreatedHomePage(navController: NavController) {
                     .padding(10.dp)
                     .height(35.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                     .background(Color(0xFFFFFFFF))
 
 

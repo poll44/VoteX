@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import android.graphics.Typeface
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.Typeface
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -163,7 +163,9 @@ fun ResultPage(navController: NavController, unicId: String?) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
     ) {
         LazyColumn(
             modifier = Modifier
@@ -182,7 +184,8 @@ fun ResultPage(navController: NavController, unicId: String?) {
                         .background(Color(0xFFFFFFFF))
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 5.dp)
                             .clip(RoundedCornerShape(15.dp)),
                         verticalAlignment = Alignment.CenterVertically,
@@ -209,7 +212,9 @@ fun ResultPage(navController: NavController, unicId: String?) {
                     text = "Ringkasan Hasil Pemilihan",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(start = 20.dp).align(Alignment.TopStart)
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .align(Alignment.TopStart)
                 )
             }
             item {
@@ -226,17 +231,16 @@ fun ResultPage(navController: NavController, unicId: String?) {
                         fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.padding(15.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
                     Text(
                         text = deskripsi,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Justify,
                         modifier = Modifier.padding(horizontal = 15.dp)
                     )
+
+                    Spacer(modifier = Modifier.height(15.dp))
                     //grafik kita selesaikan nanti dulu
-                    Text(text = "Grafik Langsung", fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(15.dp), fontSize = 17.sp,)
+                    Text(text = "Grafik Langsung", fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 10.dp), fontSize = 17.sp,)
                     if (optionsDisplay.isNotEmpty()) {
                         PieChartView(optionsDisplay, totalVotes)
                     } else {
@@ -248,19 +252,20 @@ fun ResultPage(navController: NavController, unicId: String?) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
 
-                    Text(text = "Ringkasan Langsung", fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(15.dp), fontSize = 17.sp)
+                    Text(text = "Ringkasan Langsung", fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 10.dp), fontSize = 17.sp)
 
                     Text(
                         text = formattedText,
                         fontSize = 16.sp,
+                        textAlign = TextAlign.Justify,
                         modifier = Modifier.padding(start = 15.dp, end = 15.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
 
-                    Text(text = "Persentase Langsung", fontWeight = FontWeight.Bold, modifier = Modifier.padding(15.dp), fontSize = 17.sp)
+                    Text(text = "Persentase Langsung", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 15.dp, start = 15.dp, bottom = 10.dp), fontSize = 17.sp)
 
                     optionsDisplay.forEach { (optionText, voteCount) ->
                         val percentage = if (totalVotes > 0) {
@@ -328,17 +333,19 @@ fun setupPieChart(
 
     val pieData = PieData(pieDataSet).apply {
         setValueTextSize(12f)
-        setValueTextColor(Color.Black.toArgb())
+        setValueTextColor(Color.White.toArgb())
+        setValueTypeface(Typeface.defaultFromStyle(Typeface. BOLD))
     }
 
     pieChartView.apply {
         setUsePercentValues(true)
         description.isEnabled = false
-        setCenterTextSize(18f) // Mengatur ukuran teks menjadi 18
         setCenterTextColor(Color.Black.toArgb()) // Mengatur warna teks menjadi hitam
         setDrawHoleEnabled(true)
+        setExtraOffsets(7f, 10f, 5f, 5f)
         setDrawSlicesUnderHole(true)
         setHoleColor(Color.White.toArgb())
+        setDrawEntryLabels(false)
         setTransparentCircleRadius(58f)
         data = pieData
         invalidate()

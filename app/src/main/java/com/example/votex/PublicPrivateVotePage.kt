@@ -25,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +78,8 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
             voteReference.get().addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
                     // Ambil judul dan deskripsi
-                    title = snapshot.child("title").getValue(String::class.java) ?: "Tidak ada judul"
+                    title =
+                        snapshot.child("title").getValue(String::class.java) ?: "Tidak ada judul"
                     description = snapshot.child("description").getValue(String::class.java) ?: ""
 
                     // Ambil opsi-opsi
@@ -119,12 +121,14 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
             val selectedOptionIndex = options.indexOf(selectedOption)
 
             // 3. Tambahkan UID user ke voters pada opsi yang dipilih
-            val votersReference = voteReference.child("options/option${selectedOptionIndex + 1}/voters")
+            val votersReference =
+                voteReference.child("options/option${selectedOptionIndex + 1}/voters")
             votersReference.child(uid).setValue(true)
                 .addOnSuccessListener {
                     // 4. Tambahkan unicId vote ke dalam hasBeenVotedAt milik user
                     val userVoteDataReference = userReference.child("hasBeenVotedAt")
-                    userVoteDataReference.child(unicId!!).setValue(unicId)  // Menyimpan unicId sebagai identifikasi vote
+                    userVoteDataReference.child(unicId!!)
+                        .setValue(unicId)  // Menyimpan unicId sebagai identifikasi vote
                         .addOnSuccessListener {
                             // 5. Update totalVotes di node vote
                             val totalVotesReference = voteReference.child("totalVotes")
@@ -152,16 +156,18 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
 
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF0F0F0)),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            item {
+            Column {
                 Spacer(modifier = Modifier.height(40.dp))
                 Box(
                     modifier = Modifier
@@ -171,7 +177,8 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
                         .background(Color(0xFFFFFFFF))
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 5.dp)
                             .clip(RoundedCornerShape(15.dp)),
                         verticalAlignment = Alignment.CenterVertically,
@@ -194,131 +201,119 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
                         )
                     }
                 }
-                Text(
-                    text = title, // Tampilkan judul yang diambil dari Firebase
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 20.dp).align(Alignment.TopStart)
-                )
             }
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(Color(0xFFFFFFFF))
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(top = 20.dp, start = 20.dp, end = 20.dp)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.image_23),
-                            contentDescription = "Gambar Bubur",
-                            contentScale = ContentScale.Crop,
+
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFFFFFFFF))
+            ) {
+                item {
+                    Column() {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .align(Alignment.Center)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = description, // Tampilkan deskripsi yang diambil dari Firebase
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-            items(options) { option ->
-                Column {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (option == selectedOption),
-                            onClick = {
-                                selectedOption = option
-                            }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = option, fontSize = 16.sp)
-                    }
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(15.dp))
-
-                if (isDialogOpen) {
-                    AlertDialog(
-                        onDismissRequest = { isDialogOpen = false },
-                        title = { Text(text = "Konfirmasi Pilihan Anda!") },
-                        text = {
-                            Text(
-                                text = "Konfirmasi pilihan anda sebelum mengirimkan voting. Jika anda telah yakin dengan pilihan anda, tekan tombol 'Kirim'. Anda tidak dapat mengubah pilihan anda setelah mengirimkan voting."
+                                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.image_23),
+                                contentDescription = "Gambar Bubur",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .align(Alignment.Center)
                             )
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    submitVote()
-                                },
-                                colors = ButtonDefaults.buttonColors(Color(0xFF008753))
-                            ) {
-                                Text("Kirim", color = Color.White)
-                            }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = { isDialogOpen = false },
-                                colors = ButtonDefaults.buttonColors(Color(0xFFFF0000))
-                            ) {
-                                Text("Batal", color = Color.White)
-                            }
                         }
-                    )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = description, // Tampilkan deskripsi yang diambil dari Firebase
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        onClick = { isDialogOpen = true },
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 10.dp, bottom = 10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                    ) {
-                        Text(text = "Next", color = Color.White)
+                items(options) { option ->
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (option == selectedOption),
+                                onClick = {
+                                    selectedOption = option
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = Color(0xFF008753)
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = option, fontSize = 16.sp)
+                        }
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    if (isDialogOpen) {
+                        AlertDialog(
+                            onDismissRequest = { isDialogOpen = false },
+                            title = { Text(text = "Konfirmasi Pilihan Anda!") },
+                            text = {
+                                Text(
+                                    text = "Konfirmasi pilihan anda sebelum mengirimkan voting. Jika anda telah yakin dengan pilihan anda, tekan tombol 'Kirim'. Anda tidak dapat mengubah pilihan anda setelah mengirimkan voting."
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        submitVote()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753))
+                                ) {
+                                    Text("Kirim", color = Color.White)
+                                }
+                            },
+                            dismissButton = {
+                                Button(
+                                    onClick = { isDialogOpen = false },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFFF0000))
+                                ) {
+                                    Text("Batal", color = Color.White)
+                                }
+                            }
+                        )
+                    }
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = { isDialogOpen = true },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(end = 10.dp, bottom = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF008753))
+                        ) {
+                            Text(text = "Next", color = Color.White)
+                        }
                     }
                 }
             }
         }
     }
 }
-
-@Composable
-fun RadioButtonGroup(
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
-) {
-    options.forEach { option ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = (option == selectedOption),
-                onClick = { onOptionSelected(option) }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = option, fontSize = 16.sp)
-        }
-    }
-}
-
 
