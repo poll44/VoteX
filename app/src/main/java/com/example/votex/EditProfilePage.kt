@@ -92,6 +92,7 @@ fun EditProfilePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -120,10 +121,12 @@ fun EditProfilePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Box(
                     modifier = Modifier.padding(10.dp).fillMaxWidth(),
                     contentAlignment = Alignment.Center
+
                 ) {
                     Image(
                         painter = painterResource(R.drawable.pngwing_com),
@@ -261,7 +264,7 @@ fun EditProfilePage(navController: NavController) {
                         .fillMaxWidth()
                         .padding(20.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                     shape = RoundedCornerShape(50)
                 ) {
                     Text(text = "Simpan", color = Color.White)
@@ -279,6 +282,7 @@ fun EditProfilePage(navController: NavController) {
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFFFFF))
+                .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

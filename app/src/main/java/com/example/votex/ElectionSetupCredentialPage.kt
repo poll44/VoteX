@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -163,7 +166,7 @@ fun ElectionSetupCredentialPage(navController: NavController) {
                     additionalCredentials.forEachIndexed { index, credential ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 15.dp)
+                            modifier = Modifier.padding(horizontal = 14.dp)
                         ) {
                             Checkbox(
                                 checked = true,
@@ -172,12 +175,16 @@ fun ElectionSetupCredentialPage(navController: NavController) {
                                     additionalCredentials = additionalCredentials
                                         .filterIndexed { i, _ -> i != index }
                                 },
-                                enabled = true
+                                enabled = true,
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Color(0xFF008753),
+                                    checkmarkColor = Color.White
+                                ),
                             )
                             Text(
                                 text = credential.nameTagType,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(10.dp)
+                                modifier = Modifier.offset(x = (-3).dp, y = 0.dp)
                             )
                         }
                     }
@@ -186,7 +193,8 @@ fun ElectionSetupCredentialPage(navController: NavController) {
                     if (additionalCredentials.size < maxAttributes) {
                         Button(
                             onClick = { showAddCredentialDialog = true },
-                            modifier = Modifier.padding(15.dp)
+                            modifier = Modifier.padding(15.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                         ) {
                             Text(text = "Tambah Atribut Lain")
                         }
@@ -239,7 +247,8 @@ fun ElectionSetupCredentialPage(navController: NavController) {
                                             newCredentialName = ""
                                             newCredentialMaxInput = ""
                                         }
-                                    }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                 ) {
                                     Text("Tambah")
                                 }
@@ -265,7 +274,7 @@ fun ElectionSetupCredentialPage(navController: NavController) {
                             navController.navigate("election")
                         },
                         modifier = Modifier.align(Alignment.BottomEnd),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                        colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                         shape = RoundedCornerShape(50)
                     ) {
                         Text(text = "Lanjut", color = Color.White)

@@ -378,7 +378,7 @@ fun ElectionCreateVotePage(navController: NavController) {
                                     ) {
                                         Button(
                                             onClick = { imageLaunchers[index].launch("image/*") },
-                                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                             shape = RoundedCornerShape(50)
                                         ) {
                                             Text("Pilih Foto")
@@ -406,7 +406,8 @@ fun ElectionCreateVotePage(navController: NavController) {
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 10.dp)
+                                .padding(horizontal = 20.dp, vertical = 10.dp),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                         ) {
                             Text("Tambah Kandidat")
                         }
@@ -528,7 +529,7 @@ fun ElectionCreateVotePage(navController: NavController) {
                                     }
                             },
                             modifier = Modifier.align(Alignment.BottomEnd),
-                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                             shape = RoundedCornerShape(50)
                         ) {
                             Text(text = "Lanjut", color = Color.White)

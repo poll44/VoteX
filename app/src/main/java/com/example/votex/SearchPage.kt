@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,6 +86,7 @@ private lateinit var database: FirebaseDatabase
 @Composable
 fun SearchPage(navController: NavController) {
     var isDialogOpen by remember { mutableStateOf(false) }
+    var isSearchAppear by remember { mutableStateOf(false) }
     var activeEmail by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     val calendar = Calendar.getInstance()
@@ -175,16 +177,24 @@ fun SearchPage(navController: NavController) {
 
                     snapshot.children.forEach { voteSnapshot ->
                         // Memeriksa bagian kredensial dalam setiap vote
-                        val credentialsSnapshot = voteSnapshot.child("credential/voterCredentialType")
+                        val credentialsSnapshot =
+                            voteSnapshot.child("credential/voterCredentialType")
 
                         credentialsSnapshot.children.forEach { credentialSnapshot ->
                             val credentialMap = mutableMapOf<String, Any>()
 
                             // Parsing data untuk setiap kredensial
-                            val nameTagType = credentialSnapshot.child("nameTagType").getValue(String::class.java) ?: ""
-                            val typeTag = credentialSnapshot.child("typeTag").getValue(String::class.java) ?: ""
-                            val isMandatory = credentialSnapshot.child("isMandatory").getValue(Boolean::class.java) ?: false
-                            val maxInput = credentialSnapshot.child("maxInput").getValue(Long::class.java) ?: 0L
+                            val nameTagType =
+                                credentialSnapshot.child("nameTagType").getValue(String::class.java)
+                                    ?: ""
+                            val typeTag =
+                                credentialSnapshot.child("typeTag").getValue(String::class.java)
+                                    ?: ""
+                            val isMandatory = credentialSnapshot.child("isMandatory")
+                                .getValue(Boolean::class.java) ?: false
+                            val maxInput =
+                                credentialSnapshot.child("maxInput").getValue(Long::class.java)
+                                    ?: 0L
 
                             // Menambahkan data kredensial ke dalam map
                             credentialMap["nameTagType"] = nameTagType
@@ -211,7 +221,22 @@ fun SearchPage(navController: NavController) {
         }
     }
 
+    var filteredVotes by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
 
+    // Tombol Cari untuk memicu filter
+    fun filterVotes() {
+        if (text.isEmpty()) {
+            filteredVotes = emptyList();
+            isSearchAppear = false// Jika input kosong, kosongkan daftar hasil
+            return
+        }
+
+        filteredVotes = voteList.filter { vote ->
+            val title = vote["title"] as? String ?: ""
+            val unicId = vote["unicID"] as? String ?: ""
+            title.contains(text, ignoreCase = true) || unicId.contains(text, ignoreCase = true)
+        }.take(5) // Ambil hanya 5 hasil paling sesuai
+    }
 
     Box(
         modifier = Modifier
@@ -223,7 +248,7 @@ fun SearchPage(navController: NavController) {
                 .fillMaxSize()
                 .background(Color(0xFFF0F0F0)),
             contentPadding = PaddingValues(bottom = 100.dp)  // Tambahkan padding bawah yang lebih besar
-        ){
+        ) {
             item {
                 Spacer(modifier = Modifier.height(40.dp))
                 Box(
@@ -232,6 +257,7 @@ fun SearchPage(navController: NavController) {
                         .padding(10.dp)
                         .clip(RoundedCornerShape(15.dp))
                         .background(Color(0xFFFFFFFF))
+                        .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -287,10 +313,11 @@ fun SearchPage(navController: NavController) {
                             .weight(1f)
                             .padding(end = 8.dp)
                             .height(55.dp)
+                            .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
                     )
 
                     Button(
-                        onClick = { },
+                        onClick = { isSearchAppear = true; filterVotes()},
                         shape = CircleShape,
                         modifier = Modifier
                             .height(50.dp)
@@ -300,15 +327,18 @@ fun SearchPage(navController: NavController) {
                         Text(text = "Cari", fontSize = 16.sp, color = Color.White)
                     }
                 }
-                Text(
-                    text = "Recommendation",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 20.dp)
-                )
-            }
 
-            // Tampilkan daftar vote dari Firebase
-            items(voteList) { vote ->
+            }
+            item {
+                if (isSearchAppear == true){
+                    Text(
+                        text = "Searched Item",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                }
+            }
+            items(filteredVotes) { vote ->
                 val title = vote["title"] as? String ?: "Tidak Ada Judul"
                 val unicId = vote["unicID"] as? String ?: "Tidak Ada ID"
                 val voteType = vote["type"] as? String ?: "Unknown"
@@ -322,8 +352,8 @@ fun SearchPage(navController: NavController) {
 
                 // Menentukan label dan warna berdasarkan voteType
                 val (typeLabel, typeColor) = when (voteType) {
-                    "Private" -> "PRIVAT" to Color.Red
-                    "Public" -> "PUBLIK" to Color(0xFF27AE60)
+                    "Private" -> "PRIVAT" to Color(0xFFD32F2F)
+                    "Public" -> "PUBLIK" to Color(0xFF008753)
                     "Election" -> "PEMILU" to Color(0xFFFF9500)
                     else -> "Unknown" to Color.Gray
                 }
@@ -346,10 +376,12 @@ fun SearchPage(navController: NavController) {
                                 val hours = diff / (60 * 60 * 1000)
                                 "Tersisa $hours jam"
                             }
+
                             diff < 30L * 24 * 60 * 60 * 1000 -> { // Kurang dari 1 bulan
                                 val days = diff / (24 * 60 * 60 * 1000)
                                 "Tersisa $days hari"
                             }
+
                             else -> "Tidak diketahui"
                         }
                     } else {
@@ -362,7 +394,11 @@ fun SearchPage(navController: NavController) {
                         .fillMaxWidth()
                         .padding(16.dp)
                         .background(Color.White, shape = RoundedCornerShape(16.dp))
-                        .border(1.dp, Color.Gray.copy(alpha = 0.3f), shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            Color.Gray.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .padding(16.dp)
                 ) {
                     Column {
@@ -373,7 +409,11 @@ fun SearchPage(navController: NavController) {
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clip(CircleShape)
-                                    .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = CircleShape)
+                                    .border(
+                                        1.dp,
+                                        Color.Gray.copy(alpha = 0.5f),
+                                        shape = CircleShape
+                                    )
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
@@ -383,11 +423,12 @@ fun SearchPage(navController: NavController) {
                             }
                             Text(
                                 text = typeLabel, // Menampilkan label tipe
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = typeColor, // Menampilkan warna sesuai tipe
                                 modifier = Modifier.padding(end = 10.dp)
                             )
                         }
+
                         Row {
                             Column {
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -414,8 +455,8 @@ fun SearchPage(navController: NavController) {
                                 }
                             }
                             Spacer(modifier = Modifier.width(90.dp))
-                            // Tombol Vote atau Hasil
 
+                            // Tombol Vote atau Hasil
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Bottom,
@@ -425,34 +466,40 @@ fun SearchPage(navController: NavController) {
                                 var hasVoted = remember { mutableStateOf(false) }
 
                                 // Cek apakah pengguna sudah memberikan suara
-                                val userReference = Firebase.database.getReference("users/${currentUser?.uid}")
-                                userReference.child("hasBeenVotedAt").get().addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists() && snapshot.hasChild(unicId)) {
-                                        // Jika sudah memberikan suara
-                                        hasVoted.value = true
+                                val userReference =
+                                    Firebase.database.getReference("users/${currentUser?.uid}")
+                                userReference.child("hasBeenVotedAt").get()
+                                    .addOnSuccessListener { snapshot ->
+                                        if (snapshot.exists() && snapshot.hasChild(unicId)) {
+                                            // Jika sudah memberikan suara
+                                            hasVoted.value = true
+                                        }
                                     }
-                                }
 
                                 Button(
                                     onClick = {
                                         when {
                                             isCreator -> {
-                                                navController.navigate("result")
+                                                navController.navigate("result/$unicId")
                                             }
+
                                             hasVoted.value -> {
                                                 // Jika sudah memberikan suara, tampilkan hasil
                                                 navController.navigate("result/$unicId")
                                             }
+
                                             voteType == "Private" -> {
                                                 // Aktifkan dialog PIN untuk Private
                                                 selectedVote = vote
                                                 currentDialogUnicId = unicId
                                                 pinDialog = true
                                             }
+
                                             voteType == "Public" -> {
                                                 currentDialogUnicId = unicId
                                                 navController.navigate("vote/$unicId")
                                             }
+
                                             voteType == "Election" -> {
                                                 // Aktifkan dialog kredensial untuk Election
                                                 currentDialogUnicId = unicId
@@ -460,90 +507,33 @@ fun SearchPage(navController: NavController) {
                                             }
                                         }
                                     },
-                                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
-                                    shape = RoundedCornerShape(50)
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
+                                    shape = RoundedCornerShape(50),
+                                    modifier = Modifier.padding(start = 55.dp, top = 20.dp)
                                 ) {
-                                    Text(text = if (hasVoted.value || isCreator) "Hasil" else "Vote", color = Color.White)
-
-                                    // Tampilkan AlertDialog hanya jika currentDialogUnicId cocok dengan unicId
-                                    if (pinDialog && currentDialogUnicId == unicId) {
-                                        Log.d("tes berapa kali muncul", "ini alertdialog '$unicId'") // Log hanya sekali untuk dialog ini
-
-                                        AlertDialog(
-                                            onDismissRequest = {
-                                                pinDialog = false
-                                                pinInput = ""
-                                                currentDialogUnicId = null // Reset dialog yang aktif
-                                            },
-                                            title = { Text(text = "Masukkan Pin Voting") },
-                                            text = {
-                                                Column {
-                                                    Text(text = "Voting ini berjenis privat. Masukkan pin yang benar untuk masuk ke voting ini")
-                                                    Spacer(modifier = Modifier.height(8.dp))
-                                                    TextField(
-                                                        value = pinInput,
-                                                        onValueChange = { pinInput = it },
-                                                        label = { Text("PIN") },
-                                                        singleLine = true,
-                                                        visualTransformation = PasswordVisualTransformation()
-                                                    )
-                                                }
-                                            },
-                                            confirmButton = {
-                                                Button(
-                                                    onClick = {
-                                                        val storedPin = selectedVote?.get("pin")?.toString() ?: ""
-
-                                                        Log.d("PinDebug", "Judul Vote: ${selectedVote?.get("title")}")
-                                                        Log.d("PinDebug", "PIN Tersimpan: '$storedPin'")
-                                                        Log.d("PinDebug", "PIN Diinput: '$pinInput'")
-                                                        Log.d("PinDebug", "unicID: '$unicId'") // Debug unicId yang dipilih
-
-                                                        if (pinInput.trim() == storedPin.trim()) {
-                                                            navController.navigate("vote/$unicId") // Kirim unicId ke halaman tujuan
-                                                            pinDialog = false
-                                                            pinInput = ""
-                                                            currentDialogUnicId = null // Reset dialog yang aktif
-                                                        } else {
-                                                            Toast.makeText(
-                                                                mContext,
-                                                                "Pin anda salah. Coba lagi.",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                    },
-                                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753))
-                                                ) {
-                                                    Text("Lanjut", color = Color.White)
-                                                }
-                                            },
-                                            dismissButton = {
-                                                Button(
-                                                    onClick = {
-                                                        pinDialog = false
-                                                        pinInput = ""
-                                                        currentDialogUnicId = null // Reset dialog yang aktif
-                                                    },
-                                                    colors = ButtonDefaults.buttonColors(Color.Gray)
-                                                ) {
-                                                    Text("Batal", color = Color.White)
-                                                }
-                                            }
-                                        )
-                                    }
-
-                                    val userInputs = remember { mutableStateMapOf<String, String>() }
+                                    Text(
+                                        text = if (hasVoted.value || isCreator) "Hasil" else "Vote",
+                                        color = Color.White
+                                    )
+                                    val userInputs =
+                                        remember { mutableStateMapOf<String, String>() }
 
                                     if (currentUser != null) {
                                         var fetchedUser by remember { mutableStateOf<User?>(null) }
-                                        var displayedCredentials by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
+                                        var displayedCredentials by remember {
+                                            mutableStateOf<List<Map<String, Any>>>(
+                                                emptyList()
+                                            )
+                                        }
 
                                         // Ambil data pengguna
                                         LaunchedEffect(currentUser.uid) {
-                                            val userRef = database.getReference("users").child(currentUser.uid)
+                                            val userRef = database.getReference("users")
+                                                .child(currentUser.uid)
                                             userRef.get().addOnSuccessListener { snapshot ->
                                                 if (snapshot.exists()) {
-                                                    val user = snapshot.getValue(User::class.java)
+                                                    val user =
+                                                        snapshot.getValue(User::class.java)
                                                     fetchedUser = user
                                                 }
                                             }
@@ -551,10 +541,12 @@ fun SearchPage(navController: NavController) {
 
                                         // Ambil data kredensial dari votes
                                         LaunchedEffect(unicId) {
-                                            val voteRef = database.getReference("votes").child(unicId)
+                                            val voteRef =
+                                                database.getReference("votes").child(unicId)
                                             voteRef.get().addOnSuccessListener { snapshot ->
-                                                val credentialList = snapshot.child("credential/voterCredentialType")
-                                                    .children.mapNotNull { it.value as? Map<String, Any> }
+                                                val credentialList =
+                                                    snapshot.child("credential/voterCredentialType")
+                                                        .children.mapNotNull { it.value as? Map<String, Any> }
                                                 displayedCredentials = credentialList
                                             }
                                         }
@@ -576,7 +568,10 @@ fun SearchPage(navController: NavController) {
                                                     Column(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .heightIn(min = 200.dp, max = 400.dp)
+                                                            .heightIn(
+                                                                min = 200.dp,
+                                                                max = 400.dp
+                                                            )
                                                             .padding(8.dp)
                                                     ) {
                                                         Text(
@@ -590,53 +585,93 @@ fun SearchPage(navController: NavController) {
                                                             modifier = Modifier
                                                                 .fillMaxWidth()
                                                                 .weight(1f)
-                                                                .verticalScroll(rememberScrollState())
+                                                                .verticalScroll(
+                                                                    rememberScrollState()
+                                                                )
                                                         ) {
                                                             Column {
                                                                 if (displayedCredentials.isNotEmpty()) {
                                                                     displayedCredentials.forEach { credential ->
-                                                                        val nameTagType = credential["nameTagType"] as? String ?: "Unknown"
-                                                                        val typeTag = credential["typeTag"] as? String ?: "text"
-                                                                        val isMandatory = credential["isMandatory"] as? Boolean ?: false
+                                                                        val nameTagType =
+                                                                            credential["nameTagType"] as? String
+                                                                                ?: "Unknown"
+                                                                        val typeTag =
+                                                                            credential["typeTag"] as? String
+                                                                                ?: "text"
+                                                                        val isMandatory =
+                                                                            credential["isMandatory"] as? Boolean
+                                                                                ?: false
 
                                                                         // Ambil nilai yang ada di fetchedUser dengan aman dan validasi null check
-                                                                        val fetchedValue = when (typeTag) {
-                                                                            "fullName" -> fetchedUser?.name ?: ""
-                                                                            "email" -> fetchedUser?.email ?: ""
-                                                                            "birthDate" -> fetchedUser?.birthDate ?: ""
-                                                                            "place" -> fetchedUser?.place ?: ""
-                                                                            else -> userInputs[typeTag].orEmpty()
-                                                                        }
+                                                                        val fetchedValue =
+                                                                            when (typeTag) {
+                                                                                "fullName" -> fetchedUser?.name
+                                                                                    ?: ""
+
+                                                                                "email" -> fetchedUser?.email
+                                                                                    ?: ""
+
+                                                                                "birthDate" -> fetchedUser?.birthDate
+                                                                                    ?: ""
+
+                                                                                "place" -> fetchedUser?.place
+                                                                                    ?: ""
+
+                                                                                else -> userInputs[typeTag].orEmpty()
+                                                                            }
 
                                                                         // Tetapkan nilai jika belum diisi oleh user
                                                                         if ((userInputs[typeTag]?.isEmpty() == true) && fetchedValue?.isNotEmpty() == true) {
-                                                                            userInputs[typeTag] = fetchedValue ?: ""
+                                                                            userInputs[typeTag] =
+                                                                                fetchedValue
+                                                                                    ?: ""
                                                                         }
 
                                                                         // Berikan fleksibilitas kepada user untuk mengisi ulang jika diinginkan
                                                                         OutlinedTextField(
                                                                             value = userInputs[typeTag].orEmpty(),
                                                                             onValueChange = {
-                                                                                userInputs[typeTag] = it
+                                                                                userInputs[typeTag] =
+                                                                                    it
                                                                             },
-                                                                            label = { Text(nameTagType) },
-                                                                            placeholder = { Text("Masukkan $nameTagType") },
+                                                                            label = {
+                                                                                Text(
+                                                                                    nameTagType
+                                                                                )
+                                                                            },
+                                                                            placeholder = {
+                                                                                Text(
+                                                                                    "Masukkan $nameTagType"
+                                                                                )
+                                                                            },
                                                                             modifier = Modifier.fillMaxWidth(),
                                                                             singleLine = true,
                                                                             isError = isMandatory && userInputs[typeTag]?.isEmpty() == true,
                                                                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                                                                focusedBorderColor = Color(0xFF008753),
-                                                                                unfocusedBorderColor = Color(0xFF008753),
-                                                                                cursorColor = Color(0xFF008753),
+                                                                                focusedBorderColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
+                                                                                unfocusedBorderColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
+                                                                                cursorColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
                                                                             ),
                                                                         )
-                                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                                        Spacer(
+                                                                            modifier = Modifier.height(
+                                                                                8.dp
+                                                                            )
+                                                                        )
                                                                     }
                                                                 } else {
                                                                     Text(
                                                                         text = "Tidak ada kredensial yang perlu diisi.",
                                                                         color = Color.Gray,
-                                                                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                                                                        modifier = Modifier.align(
+                                                                            Alignment.CenterHorizontally
+                                                                        )
                                                                     )
                                                                 }
                                                             }
@@ -647,41 +682,69 @@ fun SearchPage(navController: NavController) {
                                                     Button(
                                                         onClick = {
                                                             displayedCredentials.forEach { credential ->
-                                                                val typeTag = credential["typeTag"] ?: "unknown"
-                                                                Log.d("CredentialDebug", "typeTag: $typeTag, value: ${userInputs[typeTag]}")
+                                                                val typeTag =
+                                                                    credential["typeTag"]
+                                                                        ?: "unknown"
+                                                                Log.d(
+                                                                    "CredentialDebug",
+                                                                    "typeTag: $typeTag, value: ${userInputs[typeTag]}"
+                                                                )
                                                             }
 
-                                                            val isValid = displayedCredentials.all { credential ->
-                                                                val typeTag = credential["typeTag"] ?: "unknown"
-                                                                val isMandatory = credential["isMandatory"] as? Boolean ?: false
-                                                                if (isMandatory) {
-                                                                    userInputs[typeTag]?.isNotEmpty() == true
-                                                                } else {
-                                                                    true
+                                                            val isValid =
+                                                                displayedCredentials.all { credential ->
+                                                                    val typeTag =
+                                                                        credential["typeTag"]
+                                                                            ?: "unknown"
+                                                                    val isMandatory =
+                                                                        credential["isMandatory"] as? Boolean
+                                                                            ?: false
+                                                                    if (isMandatory) {
+                                                                        userInputs[typeTag]?.isNotEmpty() == true
+                                                                    } else {
+                                                                        true
+                                                                    }
                                                                 }
-                                                            }
 
                                                             if (isValid) {
-                                                                val combinedCredential = displayedCredentials.joinToString(separator = ",") { credential ->
-                                                                    val typeTag = credential["typeTag"] ?: "unknown"
-                                                                    val value = userInputs[typeTag].orEmpty()
-                                                                    "$typeTag:$value"
-                                                                }
+                                                                val combinedCredential =
+                                                                    displayedCredentials.joinToString(
+                                                                        separator = ","
+                                                                    ) { credential ->
+                                                                        val typeTag =
+                                                                            credential["typeTag"]
+                                                                                ?: "unknown"
+                                                                        val value =
+                                                                            userInputs[typeTag].orEmpty()
+                                                                        "$typeTag:$value"
+                                                                    }
 
-                                                                Log.d("SendingCombinedCredential", "combinedCredential sebelum disimpan: $combinedCredential")
+                                                                Log.d(
+                                                                    "SendingCombinedCredential",
+                                                                    "combinedCredential sebelum disimpan: $combinedCredential"
+                                                                )
 
                                                                 if (combinedCredential.isNotEmpty()) {
                                                                     // Simpan nilai dengan `currentBackStackEntry`
                                                                     navController.currentBackStackEntry
                                                                         ?.savedStateHandle
-                                                                        ?.set("combinedCredential", combinedCredential)
+                                                                        ?.set(
+                                                                            "combinedCredential",
+                                                                            combinedCredential
+                                                                        )
 
-                                                                    Log.d("SavedStateHandle", "combinedCredential disimpan dengan nilai: $combinedCredential")
+                                                                    Log.d(
+                                                                        "SavedStateHandle",
+                                                                        "combinedCredential disimpan dengan nilai: $combinedCredential"
+                                                                    )
 
                                                                     // Navigasi ke halaman voting
                                                                     navController.navigate("electionVote/$unicId")
                                                                 } else {
-                                                                    Log.e("SendingCombinedCredential", "combinedCredential kosong, tidak disimpan atau dinavigasikan")
+                                                                    Log.e(
+                                                                        "SendingCombinedCredential",
+                                                                        "combinedCredential kosong, tidak disimpan atau dinavigasikan"
+                                                                    )
                                                                 }
                                                             } else {
                                                                 Toast.makeText(
@@ -691,7 +754,452 @@ fun SearchPage(navController: NavController) {
                                                                 ).show()
                                                             }
                                                         },
-                                                        colors = ButtonDefaults.buttonColors(Color(0xFF008753))
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            Color(0xFF008753)
+                                                        )
+                                                    ) {
+                                                        Text("Lanjut", color = Color.White)
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            item {
+                Text(
+                    text = "Recommendation",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 20.dp)
+                )
+            }
+            // Tampilkan daftar vote dari Firebase
+            items(voteList) { vote ->
+                val title = vote["title"] as? String ?: "Tidak Ada Judul"
+                val unicId = vote["unicID"] as? String ?: "Tidak Ada ID"
+                val voteType = vote["type"] as? String ?: "Unknown"
+                val endDate = vote["endDate"] as? String ?: "01/01/2000"
+                val endTime = vote["endTime"] as? String ?: "00:00"
+                val totalVotes = vote["totalVotes"] as? Int ?: 0
+                Log.d("VoteDebug", "Displaying Total Votes Integer: $totalVotes")
+                val createdBy = vote["createdBy"] as? String ?: ""
+                val pin = vote["pin"] as? String ?: ""
+                val isCreator = currentUser?.uid == createdBy
+
+                // Menentukan label dan warna berdasarkan voteType
+                val (typeLabel, typeColor) = when (voteType) {
+                    "Private" -> "PRIVAT" to Color(0xFFD32F2F)
+                    "Public" -> "PUBLIK" to Color(0xFF008753)
+                    "Election" -> "PEMILU" to Color(0xFFFF9500)
+                    else -> "Unknown" to Color.Gray
+                }
+
+                val remainingTime = run {
+                    val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val endDateTimeString = "$endDate $endTime"
+                    val endDateTime = try {
+                        sdf.parse(endDateTimeString)
+                    } catch (e: Exception) {
+                        null
+                    }
+
+                    if (endDateTime != null) {
+                        val currentTime = Date()
+                        val diff = endDateTime.time - currentTime.time
+                        when {
+                            diff < 60 * 1000 -> "Kurang dari 1 menit" // Kurang dari 1 menit
+                            diff < 24 * 60 * 60 * 1000 -> { // Kurang dari 1 hari
+                                val hours = diff / (60 * 60 * 1000)
+                                "Tersisa $hours jam"
+                            }
+
+                            diff < 30L * 24 * 60 * 60 * 1000 -> { // Kurang dari 1 bulan
+                                val days = diff / (24 * 60 * 60 * 1000)
+                                "Tersisa $days hari"
+                            }
+
+                            else -> "Tidak diketahui"
+                        }
+                    } else {
+                        "Format waktu salah"
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            Color.Gray.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Row {
+                            Image(
+                                painter = painterResource(R.drawable.pngwing_com),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape)
+                                    .border(
+                                        1.dp,
+                                        Color.Gray.copy(alpha = 0.5f),
+                                        shape = CircleShape
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = title, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(text = "ID: $unicId", color = Color.Gray)
+                            }
+                            Text(
+                                text = typeLabel, // Menampilkan label tipe
+                                fontWeight = FontWeight.ExtraBold,
+                                color = typeColor, // Menampilkan warna sesuai tipe
+                                modifier = Modifier.padding(end = 10.dp, top = 5.dp)
+                            )
+                        }
+
+                        Row {
+                            Column {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = null,
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = remainingTime, color = Color.Gray)
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = null,
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = "$totalVotes votes", color = Color.Gray)
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(90.dp))
+
+                            // Tombol Vote atau Hasil
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Bottom,
+                                modifier = Modifier.padding(start = 8.dp)
+                            ) {
+                                var currentDialogUnicId by remember { mutableStateOf<String?>(null) } // Untuk melacak dialog yang aktif
+                                var hasVoted = remember { mutableStateOf(false) }
+
+                                // Cek apakah pengguna sudah memberikan suara
+                                val userReference =
+                                    Firebase.database.getReference("users/${currentUser?.uid}")
+                                userReference.child("hasBeenVotedAt").get()
+                                    .addOnSuccessListener { snapshot ->
+                                        if (snapshot.exists() && snapshot.hasChild(unicId)) {
+                                            // Jika sudah memberikan suara
+                                            hasVoted.value = true
+                                        }
+                                    }
+
+                                Button(
+                                    onClick = {
+                                        when {
+                                            isCreator -> {
+                                                navController.navigate("result/$unicId")
+                                            }
+
+                                            hasVoted.value -> {
+                                                // Jika sudah memberikan suara, tampilkan hasil
+                                                navController.navigate("result/$unicId")
+                                            }
+
+                                            voteType == "Private" -> {
+                                                // Aktifkan dialog PIN untuk Private
+                                                selectedVote = vote
+                                                currentDialogUnicId = unicId
+                                                pinDialog = true
+                                            }
+
+                                            voteType == "Public" -> {
+                                                currentDialogUnicId = unicId
+                                                navController.navigate("vote/$unicId")
+                                            }
+
+                                            voteType == "Election" -> {
+                                                // Aktifkan dialog kredensial untuk Election
+                                                currentDialogUnicId = unicId
+                                                kredensial = true
+                                            }
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
+                                    shape = RoundedCornerShape(50),
+                                    modifier = Modifier.padding(start = 55.dp, top = 20.dp)
+                                ) {
+                                    Text(
+                                        text = if (hasVoted.value || isCreator) "Hasil" else "Vote",
+                                        color = Color.White
+                                    )
+
+                                    val userInputs =
+                                        remember { mutableStateMapOf<String, String>() }
+
+                                    if (currentUser != null) {
+                                        var fetchedUser by remember { mutableStateOf<User?>(null) }
+                                        var displayedCredentials by remember {
+                                            mutableStateOf<List<Map<String, Any>>>(
+                                                emptyList()
+                                            )
+                                        }
+
+                                        // Ambil data pengguna
+                                        LaunchedEffect(currentUser.uid) {
+                                            val userRef = database.getReference("users")
+                                                .child(currentUser.uid)
+                                            userRef.get().addOnSuccessListener { snapshot ->
+                                                if (snapshot.exists()) {
+                                                    val user =
+                                                        snapshot.getValue(User::class.java)
+                                                    fetchedUser = user
+                                                }
+                                            }
+                                        }
+
+                                        // Ambil data kredensial dari votes
+                                        LaunchedEffect(unicId) {
+                                            val voteRef =
+                                                database.getReference("votes").child(unicId)
+                                            voteRef.get().addOnSuccessListener { snapshot ->
+                                                val credentialList =
+                                                    snapshot.child("credential/voterCredentialType")
+                                                        .children.mapNotNull { it.value as? Map<String, Any> }
+                                                displayedCredentials = credentialList
+                                            }
+                                        }
+
+                                        if (kredensial && currentDialogUnicId == unicId) {
+                                            AlertDialog(
+                                                onDismissRequest = {
+                                                    kredensial = false
+                                                    currentDialogUnicId = null
+                                                },
+                                                title = {
+                                                    Text(
+                                                        text = "Isi Data Kredensial",
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 18.sp
+                                                    )
+                                                },
+                                                text = {
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .heightIn(
+                                                                min = 200.dp,
+                                                                max = 400.dp
+                                                            )
+                                                            .padding(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = "Sebelum Anda melanjutkan ke proses pemungutan suara, Anda harus mengisi beberapa identitas Anda.",
+                                                            fontSize = 12.sp,
+                                                            color = Color.Gray,
+                                                            modifier = Modifier.padding(bottom = 16.dp)
+                                                        )
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .weight(1f)
+                                                                .verticalScroll(
+                                                                    rememberScrollState()
+                                                                )
+                                                        ) {
+                                                            Column {
+                                                                if (displayedCredentials.isNotEmpty()) {
+                                                                    displayedCredentials.forEach { credential ->
+                                                                        val nameTagType =
+                                                                            credential["nameTagType"] as? String
+                                                                                ?: "Unknown"
+                                                                        val typeTag =
+                                                                            credential["typeTag"] as? String
+                                                                                ?: "text"
+                                                                        val isMandatory =
+                                                                            credential["isMandatory"] as? Boolean
+                                                                                ?: false
+
+                                                                        // Ambil nilai yang ada di fetchedUser dengan aman dan validasi null check
+                                                                        val fetchedValue =
+                                                                            when (typeTag) {
+                                                                                "fullName" -> fetchedUser?.name
+                                                                                    ?: ""
+
+                                                                                "email" -> fetchedUser?.email
+                                                                                    ?: ""
+
+                                                                                "birthDate" -> fetchedUser?.birthDate
+                                                                                    ?: ""
+
+                                                                                "place" -> fetchedUser?.place
+                                                                                    ?: ""
+
+                                                                                else -> userInputs[typeTag].orEmpty()
+                                                                            }
+
+                                                                        // Tetapkan nilai jika belum diisi oleh user
+                                                                        if ((userInputs[typeTag]?.isEmpty() == true) && fetchedValue?.isNotEmpty() == true) {
+                                                                            userInputs[typeTag] =
+                                                                                fetchedValue
+                                                                                    ?: ""
+                                                                        }
+
+                                                                        // Berikan fleksibilitas kepada user untuk mengisi ulang jika diinginkan
+                                                                        OutlinedTextField(
+                                                                            value = userInputs[typeTag].orEmpty(),
+                                                                            onValueChange = {
+                                                                                userInputs[typeTag] =
+                                                                                    it
+                                                                            },
+                                                                            label = {
+                                                                                Text(
+                                                                                    nameTagType
+                                                                                )
+                                                                            },
+                                                                            placeholder = {
+                                                                                Text(
+                                                                                    "Masukkan $nameTagType"
+                                                                                )
+                                                                            },
+                                                                            modifier = Modifier.fillMaxWidth(),
+                                                                            singleLine = true,
+                                                                            isError = isMandatory && userInputs[typeTag]?.isEmpty() == true,
+                                                                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                                                focusedBorderColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
+                                                                                unfocusedBorderColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
+                                                                                cursorColor = Color(
+                                                                                    0xFF008753
+                                                                                ),
+                                                                            ),
+                                                                        )
+                                                                        Spacer(
+                                                                            modifier = Modifier.height(
+                                                                                8.dp
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                } else {
+                                                                    Text(
+                                                                        text = "Tidak ada kredensial yang perlu diisi.",
+                                                                        color = Color.Gray,
+                                                                        modifier = Modifier.align(
+                                                                            Alignment.CenterHorizontally
+                                                                        )
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                confirmButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            displayedCredentials.forEach { credential ->
+                                                                val typeTag =
+                                                                    credential["typeTag"]
+                                                                        ?: "unknown"
+                                                                Log.d(
+                                                                    "CredentialDebug",
+                                                                    "typeTag: $typeTag, value: ${userInputs[typeTag]}"
+                                                                )
+                                                            }
+
+                                                            val isValid =
+                                                                displayedCredentials.all { credential ->
+                                                                    val typeTag =
+                                                                        credential["typeTag"]
+                                                                            ?: "unknown"
+                                                                    val isMandatory =
+                                                                        credential["isMandatory"] as? Boolean
+                                                                            ?: false
+                                                                    if (isMandatory) {
+                                                                        userInputs[typeTag]?.isNotEmpty() == true
+                                                                    } else {
+                                                                        true
+                                                                    }
+                                                                }
+
+                                                            if (isValid) {
+                                                                val combinedCredential =
+                                                                    displayedCredentials.joinToString(
+                                                                        separator = ","
+                                                                    ) { credential ->
+                                                                        val typeTag =
+                                                                            credential["typeTag"]
+                                                                                ?: "unknown"
+                                                                        val value =
+                                                                            userInputs[typeTag].orEmpty()
+                                                                        "$typeTag:$value"
+                                                                    }
+
+                                                                Log.d(
+                                                                    "SendingCombinedCredential",
+                                                                    "combinedCredential sebelum disimpan: $combinedCredential"
+                                                                )
+
+                                                                if (combinedCredential.isNotEmpty()) {
+                                                                    // Simpan nilai dengan `currentBackStackEntry`
+                                                                    navController.currentBackStackEntry
+                                                                        ?.savedStateHandle
+                                                                        ?.set(
+                                                                            "combinedCredential",
+                                                                            combinedCredential
+                                                                        )
+
+                                                                    Log.d(
+                                                                        "SavedStateHandle",
+                                                                        "combinedCredential disimpan dengan nilai: $combinedCredential"
+                                                                    )
+
+                                                                    // Navigasi ke halaman voting
+                                                                    navController.navigate("electionVote/$unicId")
+                                                                } else {
+                                                                    Log.e(
+                                                                        "SendingCombinedCredential",
+                                                                        "combinedCredential kosong, tidak disimpan atau dinavigasikan"
+                                                                    )
+                                                                }
+                                                            } else {
+                                                                Toast.makeText(
+                                                                    mContext,
+                                                                    "Harap isi semua data wajib.",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(
+                                                            Color(0xFF008753)
+                                                        )
                                                     ) {
                                                         Text("Lanjut", color = Color.White)
                                                     }
@@ -707,125 +1215,25 @@ fun SearchPage(navController: NavController) {
             }
         }
 
-        /**
-         * Bottom Navigation Bar
-         */
-//        var confirm by remember { mutableStateOf(false) }
-//        if (confirm){
-//            AlertDialog(
-//                onDismissRequest = { confirm = false },
-//                title = { Text(text = "PERINGATAN!") },
-//                text = {
-//                    Column(modifier = Modifier.fillMaxWidth()) {
-//
-//                        Text(
-//                            text = "Is the Data You Fill In Real Data?",
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 14.sp,
-//                            modifier = Modifier.padding(bottom = 4.dp)
-//                        )
-//                        Text(
-//                            text = "Before proceeding, we want to ensure that all information you provide is accurate and in accordance with reality. Invalid or inappropriate data may result in your failure to participate in this voting process.",
-//                            fontSize = 12.sp,
-//                            textAlign = TextAlign.Justify,
-//                            color = Color.Gray,
-//                            modifier = Modifier.padding(bottom = 8.dp)
-//                        )
-//
-//
-//                        Text(
-//                            text = "Why is it important?",
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 14.sp,
-//                            modifier = Modifier.padding(bottom = 4.dp)
-//                        )
-//                        Text(
-//                            text = "In a blockchain-based system, every data you enter will be recorded permanently, immutable, and become part of a digital footprint that cannot be faked. Data accuracy is essential to maintain the integrity, fairness, and transparency of the entire process.",
-//                            fontSize = 12.sp,
-//                            textAlign = TextAlign.Justify,
-//                            color = Color.Gray,
-//                            modifier = Modifier.padding(bottom = 8.dp)
-//                        )
-//
-//
-//                        Text(
-//                            text = "Remember!",
-//                            fontWeight = FontWeight.Bold,
-//                            fontSize = 14.sp,
-//                            modifier = Modifier.padding(bottom = 4.dp)
-//                        )
-//                        Text(
-//                            text = "Any data you provide is your personal responsibility. By continuing, you represent that the information provided is correct, and you are fully aware that this data will be used in a final and irreversible voting process.\n\nThe trust you build starts with the accuracy of the data you provide. Don't let this important decision be based on the wrong data!",
-//                            fontSize = 12.sp,
-//                            textAlign = TextAlign.Justify,
-//                            color = Color.Gray
-//                        )
-//
-//                        Spacer(modifier = Modifier.height(12.dp))
-//
-//
-//                        Row(modifier = Modifier.fillMaxWidth()) {
-//                            Checkbox(
-//                                checked = isChecked,
-//                                onCheckedChange = { isChecked = it }
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = "I declare that the data I have entered is correct and accountable",
-//                                fontSize = 12.sp,
-//                                color = Color.Black,
-//                                modifier = Modifier.weight(1f)
-//                            )
-//                        }
-//                    }
-//                },
-//                confirmButton = {
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Button(
-//                            onClick = { if (isChecked) navController.navigate("electionVote") },
-//                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)
-//                            ),
-//                            enabled = isChecked
-//                        ) {
-//                            Text("Next", color = Color.White)
-//                        }
-//                    }
-//                },
-//                dismissButton = {
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Button(
-//                            onClick = { kredensial = true },
-//                            colors = ButtonDefaults.buttonColors(Color.Red),
-//                            enabled = isChecked
-//                        ) {
-//                            Text("Batal", color = Color.White)
-//                        }
-//                    }
-//                }
-//            )
-//        }
 
-        if(isDialogOpen){
+        if (isDialogOpen) {
             AlertDialog(
                 onDismissRequest = { isDialogOpen = false },
                 title = { Text(text = "Jenis Vote") },
                 text = { Text(text = "Silahkan pilih jenis voting anda!") },
                 confirmButton = {
-                    Button(onClick = { navController.navigate("publicPrivate")}, colors = ButtonDefaults.buttonColors(Color(0xFF008753))) {
+                    Button(
+                        onClick = { navController.navigate("publicPrivate") },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF008753))
+                    ) {
                         Text("Public/Private", color = Color.White)
                     }
-                    Button(onClick = { navController.navigate("credential")}, colors = ButtonDefaults.buttonColors(Color(0xFFFF9500)
-                    )) {
+                    Button(
+                        onClick = { navController.navigate("credential") },
+                        colors = ButtonDefaults.buttonColors(
+                            Color(0xFFFF9500)
+                        )
+                    ) {
                         Text("Election")
                     }
                 },
@@ -841,7 +1249,10 @@ fun SearchPage(navController: NavController) {
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add Icon",
                 tint = Color(0xFF008753),
-                modifier = Modifier.fillMaxSize().background(color = Color.White, shape = CircleShape)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.White, shape = CircleShape)
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             )
         }
         Box(
@@ -851,6 +1262,7 @@ fun SearchPage(navController: NavController) {
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFFFFF))
+                .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -862,7 +1274,7 @@ fun SearchPage(navController: NavController) {
                     .clip(RoundedCornerShape(15.dp))
             ) {
                 IconButton(
-                    onClick = {navController.navigate("created")},
+                    onClick = { navController.navigate("created") },
                 ) {
                     Image(
                         painter = painterResource(R.drawable.vector),
@@ -890,7 +1302,7 @@ fun SearchPage(navController: NavController) {
                         .width(2.dp)
                 )
                 IconButton(
-                    onClick = {navController.navigate("profile")},
+                    onClick = { navController.navigate("profile") },
                 ) {
                     Image(
                         painter = painterResource(R.drawable.group_138),

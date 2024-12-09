@@ -110,6 +110,7 @@ fun ProfilePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -138,6 +139,7 @@ fun ProfilePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Box(
                     modifier = Modifier.padding(10.dp).fillMaxWidth(),
@@ -259,18 +261,20 @@ fun ProfilePage(navController: NavController) {
                     onValueChange = { }
                 )
 
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 5.dp)) {
                     Button(
                         onClick = { logout() },
-                        modifier = Modifier.align(Alignment.Center),
-                        shape = RoundedCornerShape(50)
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                            .padding(end = 100.dp),
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(Color(0xFFD32F2F)),
                     ) {
                         Text("Logout", color = Color.White)
                     }
                     Button(
                         onClick = { navController.navigate("editProfile") },
                         modifier = Modifier.align(Alignment.BottomEnd),
-                        colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                        colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                         shape = RoundedCornerShape(50)
                     ) {
                         Text(text = "Ubah", color = Color.White)
@@ -288,6 +292,7 @@ fun ProfilePage(navController: NavController) {
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFFFFF))
+                .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

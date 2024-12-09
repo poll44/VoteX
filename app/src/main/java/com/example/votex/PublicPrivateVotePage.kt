@@ -136,7 +136,7 @@ fun PublicPrivateVotePage(navController: NavController, unicId: String?) {
                             }
 
                             // Navigasi ke halaman hasil
-                            navController.navigate("result/$unicId")
+                            navController.navigate("result/{$unicId}")
                         }
                         .addOnFailureListener { e ->
                             Log.e("VoteSubmission", "Gagal menambahkan vote ke user: ${e.message}")

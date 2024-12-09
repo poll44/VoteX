@@ -242,13 +242,13 @@ fun PublicPrivateCreateVotePage(navController: NavController) {
                             selected = voteType == VoteType.Private,
                             onClick = { voteType = VoteType.Private },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = Color(0xFF008753),
+                                selectedColor = Color(0xFFD32F2F),
                                 unselectedColor = Color.Gray
                             )
                         )
                         Text(
                             text = "Privat",
-                            color = if (voteType == VoteType.Private) Color(0xFF008753) else Color.Gray
+                            color = if (voteType == VoteType.Private) Color(0xFFD32F2F) else Color.Gray
                         )
                     }
 
@@ -299,7 +299,7 @@ fun PublicPrivateCreateVotePage(navController: NavController) {
                             onClick = {
                                 launcher.launch("image/*")
                             },
-                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                             shape = RoundedCornerShape(50)
                         ) {
                             Text("Pilih Foto")
@@ -416,7 +416,7 @@ fun PublicPrivateCreateVotePage(navController: NavController) {
                                         e.printStackTrace()
                                     }
                                 },
-                                colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                 shape = RoundedCornerShape(50)
                             ) {
                                 Text("Tambah Pilihan")
@@ -465,7 +465,7 @@ fun PublicPrivateCreateVotePage(navController: NavController) {
                         Button(onClick = {
                             isDialogOpen = true
                         },  modifier = Modifier.align(Alignment.BottomEnd),
-                            colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                             shape = RoundedCornerShape(50)) {
                             Text("Buat")
                         }
@@ -492,7 +492,7 @@ fun PublicPrivateCreateVotePage(navController: NavController) {
                                         isDialogOpen = false
 
                                     },
-                                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60))
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753))
                                 ) {
                                     Text("Kirim")
                                 }

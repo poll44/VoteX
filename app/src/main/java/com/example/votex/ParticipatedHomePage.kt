@@ -205,8 +205,8 @@ fun ParticipatedHomePage(navController: NavController) {
 
                     // Warna dan label berdasarkan tipe vote
                     val typeLabel = when (voteType) {
-                        "Private" -> "PRIVAT" to Color.Red
-                        "Public" -> "PUBLIK" to Color(0xFF27AE60)
+                        "Private" -> "PRIVAT" to Color(0xFFD32F2F)
+                        "Public" -> "PUBLIK" to Color(0xFF008753)
                         "Election" -> "PEMILU" to Color(0xFFFF9500)
                         else -> "Unknown" to Color.Gray
                     }
@@ -267,7 +267,7 @@ fun ParticipatedHomePage(navController: NavController) {
                             }
                             Text(
                                 text = typeLabel.first,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = typeLabel.second
                             )
                         }
@@ -312,7 +312,7 @@ fun ParticipatedHomePage(navController: NavController) {
                                 }
                                 Button(
                                     onClick = { navController.navigate("result/{$unicId}") },
-                                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                     shape = RoundedCornerShape(50)
                                 ) {
                                     Text(text = "Hasil", color = Color.White)

@@ -141,7 +141,7 @@ fun ElectionVotePage(navController: NavController, unicId: String) {
                                 val currentTotalVotes = totalSnapshot.getValue(Long::class.java) ?: 0L
                                 totalVotesReference.setValue(currentTotalVotes + 1).addOnSuccessListener {
                                     Log.d("VoteSubmission", "Voting successful")
-                                    navController.navigate("result/$unicId")
+                                    navController.navigate("result/{$unicId}")
                                 }
                             }
                         }

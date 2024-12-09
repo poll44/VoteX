@@ -136,6 +136,7 @@ fun CreatedHomePage(navController: NavController) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(15.dp))
                     .background(Color(0xFFFFFFFF))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -163,7 +164,10 @@ fun CreatedHomePage(navController: NavController) {
                     .padding(10.dp)
                     .height(35.dp)
                     .clip(RoundedCornerShape(20.dp))
+                    .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                     .background(Color(0xFFFFFFFF))
+
+
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -211,8 +215,8 @@ fun CreatedHomePage(navController: NavController) {
 
                     // Warna dan label berdasarkan tipe vote
                     val typeLabel = when (voteType) {
-                        "Private" -> "PRIVAT" to Color.Red
-                        "Public" -> "PUBLIK" to Color(0xFF27AE60)
+                        "Private" -> "PRIVAT" to Color(0xFFD32F2F)
+                        "Public" -> "PUBLIK" to Color(0xFF008753)
                         "Election" -> "PEMILU" to Color(0xFFFF9500)
                         else -> "Unknown" to Color.Gray
                     }
@@ -273,7 +277,7 @@ fun CreatedHomePage(navController: NavController) {
                             }
                             Text(
                                 text = typeLabel.first,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = typeLabel.second
                             )
                         }
@@ -320,7 +324,7 @@ fun CreatedHomePage(navController: NavController) {
                                 }
                                 Button(
                                     onClick = { navController.navigate("result/{$unicId}") },
-                                    colors = ButtonDefaults.buttonColors(Color(0xFF27AE60)),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                     shape = RoundedCornerShape(50)
                                 ) {
                                     Text(text = "Hasil", color = Color.White)
@@ -370,6 +374,7 @@ fun CreatedHomePage(navController: NavController) {
                 .align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFFFFFFF))
+                .border((0.5).dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(15.dp))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
