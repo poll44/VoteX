@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "820923854763",
+    "firebase_url": "https://projekpapb-aa1bd-default-rtdb.firebaseio.com",
     "project_id": "projekpapb-aa1bd",
     "storage_bucket": "projekpapb-aa1bd.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.votex"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "820923854763-kbmg4afg2rlb7hv1m2r3ot7ijqogb89o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.votex",
+            "certificate_hash": "fcbc93e2fdfc93acf032cfb28a8e12b06a940621"
+          }
+        },
+        {
+          "client_id": "820923854763-9torn583188172g2577gfgmt6570f189.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDxQR8mXMizJRWvb2xyq2Khwv2eOq3KIGE"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820923854763-9torn583188172g2577gfgmt6570f189.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

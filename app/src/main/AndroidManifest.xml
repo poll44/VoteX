@@ -22,6 +22,12 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <meta-data
+                android:name="com.google.android.gms.client.GOOGLE_APP_ID"
+                android:value="1:820923854763:android:projekpapb-aa1bd" />
+            <meta-data
+                android:name="com.google.android.gms.auth.api.signin"
+                android:value="@string/default_web_client_id" />
         </activity>
 
         <activity

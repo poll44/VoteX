@@ -458,9 +458,9 @@ fun SearchPage(navController: NavController) {
 
                             // Tombol Vote atau Hasil
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Bottom,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.fillMaxSize(), // Memastikan Column mengisi seluruh ruang yang tersedia
+                                horizontalAlignment = Alignment.End, // Horizontal ke kanan
+                                verticalArrangement = Arrangement.Bottom, // Vertikal ke bawah
                             ) {
                                 var currentDialogUnicId by remember { mutableStateOf<String?>(null) } // Untuk melacak dialog yang aktif
                                 var hasVoted = remember { mutableStateOf(false) }
@@ -509,7 +509,7 @@ fun SearchPage(navController: NavController) {
                                     },
                                     colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                     shape = RoundedCornerShape(50),
-                                    modifier = Modifier.padding(start = 55.dp, top = 20.dp)
+                                    modifier = Modifier.padding(top = 20.dp)
                                 ) {
                                     Text(
                                         text = if (hasVoted.value || isCreator) "Hasil" else "Vote",
@@ -549,6 +549,68 @@ fun SearchPage(navController: NavController) {
                                                         .children.mapNotNull { it.value as? Map<String, Any> }
                                                 displayedCredentials = credentialList
                                             }
+                                        }
+                                        if (pinDialog && currentDialogUnicId == unicId) {
+                                            Log.d("tes berapa kali muncul", "ini alertdialog '$unicId'") // Log hanya sekali untuk dialog ini
+                                            AlertDialog(
+                                                onDismissRequest = {
+                                                    pinDialog = false
+                                                    pinInput = ""
+                                                    currentDialogUnicId = null // Reset dialog yang aktif
+                                                },
+                                                title = { Text(text = "Masukkan Pin Voting") },
+                                                text = {
+                                                    Column {
+                                                        Text(text = "Voting ini berjenis privat. Masukkan pin yang benar untuk masuk ke voting ini")
+                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                        TextField(
+                                                            value = pinInput,
+                                                            onValueChange = { pinInput = it },
+                                                            label = { Text("PIN") },
+                                                            singleLine = true,
+                                                            visualTransformation = PasswordVisualTransformation()
+                                                        )
+                                                    }
+                                                },
+                                                confirmButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            val storedPin = selectedVote?.get("pin")?.toString() ?: ""
+                                                            Log.d("PinDebug", "Judul Vote: ${selectedVote?.get("title")}")
+                                                            Log.d("PinDebug", "PIN Tersimpan: '$storedPin'")
+                                                            Log.d("PinDebug", "PIN Diinput: '$pinInput'")
+                                                            Log.d("PinDebug", "unicID: '$unicId'") // Debug unicId yang dipilih
+                                                            if (pinInput.trim() == storedPin.trim()) {
+                                                                navController.navigate("vote/$unicId") // Kirim unicId ke halaman tujuan
+                                                                pinDialog = false
+                                                                pinInput = ""
+                                                                currentDialogUnicId = null // Reset dialog yang aktif
+                                                            } else {
+                                                                Toast.makeText(
+                                                                    mContext,
+                                                                    "Pin anda salah. Coba lagi.",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(Color(0xFF008753))
+                                                    ) {
+                                                        Text("Lanjut", color = Color.White)
+                                                    }
+                                                },
+                                                dismissButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            pinDialog = false
+                                                            pinInput = ""
+                                                            currentDialogUnicId = null // Reset dialog yang aktif
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                                                    ) {
+                                                        Text("Batal", color = Color.White)
+                                                    }
+                                                }
+                                            )
                                         }
 
                                         if (kredensial && currentDialogUnicId == unicId) {
@@ -900,9 +962,9 @@ fun SearchPage(navController: NavController) {
 
                             // Tombol Vote atau Hasil
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Bottom,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.fillMaxSize(), // Memastikan Column mengisi seluruh ruang yang tersedia
+                                horizontalAlignment = Alignment.End, // Horizontal ke kanan
+                                verticalArrangement = Arrangement.Bottom, // Vertikal ke bawah
                             ) {
                                 var currentDialogUnicId by remember { mutableStateOf<String?>(null) } // Untuk melacak dialog yang aktif
                                 var hasVoted = remember { mutableStateOf(false) }
@@ -951,7 +1013,7 @@ fun SearchPage(navController: NavController) {
                                     },
                                     colors = ButtonDefaults.buttonColors(Color(0xFF008753)),
                                     shape = RoundedCornerShape(50),
-                                    modifier = Modifier.padding(start = 55.dp, top = 20.dp)
+                                    modifier = Modifier.padding(top = 20.dp)
                                 ) {
                                     Text(
                                         text = if (hasVoted.value || isCreator) "Hasil" else "Vote",
@@ -993,7 +1055,68 @@ fun SearchPage(navController: NavController) {
                                                 displayedCredentials = credentialList
                                             }
                                         }
-
+                                        if (pinDialog && currentDialogUnicId == unicId) {
+                                            Log.d("tes berapa kali muncul", "ini alertdialog '$unicId'") // Log hanya sekali untuk dialog ini
+                                            AlertDialog(
+                                                onDismissRequest = {
+                                                    pinDialog = false
+                                                    pinInput = ""
+                                                    currentDialogUnicId = null // Reset dialog yang aktif
+                                                },
+                                                title = { Text(text = "Masukkan Pin Voting") },
+                                                text = {
+                                                    Column {
+                                                        Text(text = "Voting ini berjenis privat. Masukkan pin yang benar untuk masuk ke voting ini")
+                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                        TextField(
+                                                            value = pinInput,
+                                                            onValueChange = { pinInput = it },
+                                                            label = { Text("PIN") },
+                                                            singleLine = true,
+                                                            visualTransformation = PasswordVisualTransformation()
+                                                        )
+                                                    }
+                                                },
+                                                confirmButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            val storedPin = selectedVote?.get("pin")?.toString() ?: ""
+                                                            Log.d("PinDebug", "Judul Vote: ${selectedVote?.get("title")}")
+                                                            Log.d("PinDebug", "PIN Tersimpan: '$storedPin'")
+                                                            Log.d("PinDebug", "PIN Diinput: '$pinInput'")
+                                                            Log.d("PinDebug", "unicID: '$unicId'") // Debug unicId yang dipilih
+                                                            if (pinInput.trim() == storedPin.trim()) {
+                                                                navController.navigate("vote/$unicId") // Kirim unicId ke halaman tujuan
+                                                                pinDialog = false
+                                                                pinInput = ""
+                                                                currentDialogUnicId = null // Reset dialog yang aktif
+                                                            } else {
+                                                                Toast.makeText(
+                                                                    mContext,
+                                                                    "Pin anda salah. Coba lagi.",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(Color(0xFF008753))
+                                                    ) {
+                                                        Text("Lanjut", color = Color.White)
+                                                    }
+                                                },
+                                                dismissButton = {
+                                                    Button(
+                                                        onClick = {
+                                                            pinDialog = false
+                                                            pinInput = ""
+                                                            currentDialogUnicId = null // Reset dialog yang aktif
+                                                        },
+                                                        colors = ButtonDefaults.buttonColors(Color.Gray)
+                                                    ) {
+                                                        Text("Batal", color = Color.White)
+                                                    }
+                                                }
+                                            )
+                                        }
                                         if (kredensial && currentDialogUnicId == unicId) {
                                             AlertDialog(
                                                 onDismissRequest = {

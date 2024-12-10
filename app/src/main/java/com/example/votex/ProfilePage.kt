@@ -1,5 +1,6 @@
 package com.example.votex
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -36,12 +37,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -60,6 +64,7 @@ fun ProfilePage(navController: NavController) {
     var userBirthDate by remember { mutableStateOf("") }
     var userPlace by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     if (!LocalInspectionMode.current) {
         auth = Firebase.auth
@@ -95,10 +100,25 @@ fun ProfilePage(navController: NavController) {
                 Log.e("User Data", "Error getting data", exception)
             }
     }
-    fun logout() {
-        auth.signOut() // Keluar dari akun Firebase
-        navController.navigate("login") // Arahkan kembali ke halaman login
+    fun logout(context: Context, navController: NavController) {
+        // Keluar dari akun Firebase
+        FirebaseAuth.getInstance().signOut()
+
+        // Keluar dari sesi GoogleSignIn
+        val googleSignInClient = GoogleSignIn.getClient(context,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+        )
+        googleSignInClient.signOut().addOnCompleteListener {
+            Toast.makeText(context, "Sign out successful", Toast.LENGTH_SHORT).show()
+
+            // Arahkan kembali ke halaman login
+            navController.navigate("login") {
+                // Clear semua halaman sebelumnya dari stack
+                popUpTo("login") { inclusive = true }
+            }
+        }
     }
+
     Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))) {
         Column(
             modifier = Modifier.fillMaxSize().background(Color(0xFFF0F0F0))
@@ -263,7 +283,7 @@ fun ProfilePage(navController: NavController) {
 
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 5.dp)) {
                     Button(
-                        onClick = { logout() },
+                        onClick = { logout(context, navController) },
                         modifier = Modifier.align(Alignment.BottomEnd)
                             .padding(end = 100.dp),
                         shape = RoundedCornerShape(50),

@@ -1,6 +1,9 @@
 import android.content.ContentValues
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +22,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.votex.R
 import com.example.votex.User
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 
 private lateinit var auth: FirebaseAuth
@@ -96,6 +104,78 @@ fun RegisterPage(navController: NavController) {
                 }
             }
     }
+
+
+    // Konfigurasi untuk Firebase dan Database
+    auth = FirebaseAuth.getInstance()
+    database = FirebaseDatabase.getInstance()
+
+    // Konfigurasi Google Sign-In
+    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(mContext.getString(R.string.default_web_client_id)) // Ini harus mengarah ke Web Client ID dari konsol Firebase.
+        .requestEmail()
+        .build()
+    val googleClient = GoogleSignIn.getClient(mContext, googleSignInOptions)
+    val signInIntent = googleClient.signInIntent
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+            if (task == null) {
+                Toast.makeText(mContext, "Google Sign-In failed: task is null", Toast.LENGTH_SHORT).show()
+                return@rememberLauncherForActivityResult
+            }
+
+            val idToken = task?.result?.idToken
+            if (idToken.isNullOrEmpty()) {
+                Toast.makeText(mContext, "Unable to get ID Token", Toast.LENGTH_SHORT).show()
+                return@rememberLauncherForActivityResult
+            }
+
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+            // Firebase authentication
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { authResult ->
+                    if (authResult.isSuccessful) {
+                        val user = authResult.result?.user
+                        if (user != null) {
+                            val userRef = database.reference.child("users").child(user.uid)
+
+                            userRef.get().addOnSuccessListener { snapshot ->
+                                if (!snapshot.exists()) {
+                                    val newUser = User(
+                                        profilePhoto = "",
+                                        name = user.displayName ?: "",
+                                        email = user.email ?: "",
+                                        password = "",
+                                        birthDate = "",
+                                        place = "",
+                                        hasVotedAt = emptyList()
+                                    )
+                                    userRef.setValue(newUser)
+                                        .addOnCompleteListener {
+                                            if (it.isSuccessful) {
+                                                Toast.makeText(mContext, "Google sign-in successful", Toast.LENGTH_SHORT).show()
+                                                navController.navigate("created")
+                                            }
+                                        }
+                                } else {
+                                    Toast.makeText(mContext, "Welcome back!", Toast.LENGTH_SHORT).show()
+                                    navController.navigate("created")
+                                }
+                            }
+                        }
+                    } else {
+                        Toast.makeText(mContext, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception) {
+            Toast.makeText(mContext, "Unexpected error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     Image(
         painter = painterResource(id = R.drawable.ic_main_background),
@@ -202,7 +282,7 @@ fun RegisterPage(navController: NavController) {
         }
 
         Button(
-            onClick = { /* Google sign-in logic here */ },
+            onClick = { launcher.launch(signInIntent) },
             modifier = Modifier
                 .width(250.dp)
                 .height(90.dp)
