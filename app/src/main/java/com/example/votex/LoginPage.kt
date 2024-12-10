@@ -1,6 +1,7 @@
 package com.example.votex
 
 import android.content.ContentValues
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,9 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -77,6 +80,8 @@ fun LoginPage(navController: NavController) {
                 }
             }
     }
+
+
 // Konfigurasi untuk Firebase dan Database
     auth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
@@ -211,13 +216,20 @@ fun LoginPage(navController: NavController) {
             Text(text = "MASUK")
         }
 
-        Text(
-            modifier = Modifier.padding(10.dp),
-            text = "Forgot Password?",
-            color = Color.White,
-            textAlign = TextAlign.End
-        )
+        var isForgotPasswordDialogOpen by remember { mutableStateOf(false) }
 
+        TextButton(
+            modifier = Modifier.padding(10.dp),
+            onClick = {isForgotPasswordDialogOpen = true }
+
+        ){
+            Text("Forgot Password", color = Color.White,textAlign = TextAlign.End)
+        }
+        ForgotPasswordDialog(
+            isDialogOpen = isForgotPasswordDialogOpen,
+            onDismiss = { isForgotPasswordDialogOpen = false },
+            context = LocalContext.current
+        )
         Spacer(modifier = Modifier.height(210.dp))
 
         Row {
@@ -263,5 +275,62 @@ fun LoginPage(navController: NavController) {
                 Text("Log in with Google")
             }
         }
+    }
+
+}
+
+@Composable
+fun ForgotPasswordDialog(
+    isDialogOpen: Boolean,
+    onDismiss: () -> Unit,
+    context: Context
+) {
+    fun forgotPassword(email: String, context: Context) {
+        if (email.isEmpty()) {
+            Toast.makeText(context, "Please enter your email", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(context, "Password reset email sent. Check your inbox.", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, "Error sending password reset email: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+    var email by remember { mutableStateOf("") }
+
+    if (isDialogOpen) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Reset Password") },
+            text = {
+                Column {
+                    Text("Please enter your email to reset your password:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        placeholder = { Text("Enter email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    forgotPassword(email, context)
+                    onDismiss()
+                }) {
+                    Text("Submit")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismiss() }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
