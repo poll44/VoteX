@@ -63,7 +63,6 @@ fun ProfilePage(navController: NavController) {
     var userName by remember { mutableStateOf("") }
     var userBirthDate by remember { mutableStateOf("") }
     var userPlace by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     if (!LocalInspectionMode.current) {
@@ -87,10 +86,9 @@ fun ProfilePage(navController: NavController) {
                         userName = it.name
                         userBirthDate = it.birthDate
                         userPlace = it.place
-                        password = it.password
 
                         // Log hasil untuk debugging
-                        Log.d("User Data", "Name: $userName, BirthDate: $userBirthDate, Place: $userPlace, Password: $password")
+                        Log.d("User Data", "Name: $userName, BirthDate: $userBirthDate, Place: $userPlace")
                     }
                 } else {
                     Log.w("User Data", "No data found for UID: $uidAuth")
@@ -217,27 +215,6 @@ fun ProfilePage(navController: NavController) {
                     onValueChange = { }
                 )
 
-                // Password
-                Text(
-                    text = "Password",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = password, // Sesuaikan dengan tanggal lahir yang sebenarnya
-                    enabled = false,
-                    visualTransformation = PasswordVisualTransformation(),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color(0xFF008753),
-                        cursorColor = Color(0xFF008753),
-                    ),
-                    onValueChange = { }
-                )
 
                 // Tanggal lahir
                 Text(

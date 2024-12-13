@@ -125,7 +125,6 @@ fun LoginPage(navController: NavController) {
                                         profilePhoto = "",
                                         name = user.displayName ?: "",
                                         email = user.email ?: "",
-                                        password = "",
                                         birthDate = "",
                                         place = "",
                                         hasVotedAt = emptyList()

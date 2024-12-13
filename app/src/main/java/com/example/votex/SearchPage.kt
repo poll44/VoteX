@@ -226,8 +226,8 @@ fun SearchPage(navController: NavController) {
     // Tombol Cari untuk memicu filter
     fun filterVotes() {
         if (text.isEmpty()) {
-            filteredVotes = emptyList();
-            isSearchAppear = false// Jika input kosong, kosongkan daftar hasil
+            filteredVotes = emptyList()
+            isSearchAppear = false // Jika input kosong, kosongkan daftar hasil
             return
         }
 
@@ -236,6 +236,8 @@ fun SearchPage(navController: NavController) {
             val unicId = vote["unicID"] as? String ?: ""
             title.contains(text, ignoreCase = true) || unicId.contains(text, ignoreCase = true)
         }.take(5) // Ambil hanya 5 hasil paling sesuai
+
+        isSearchAppear = true // Selalu tampilkan hasil pencarian, meskipun kosong
     }
 
     Box(
@@ -330,14 +332,29 @@ fun SearchPage(navController: NavController) {
 
             }
             item {
-                if (isSearchAppear == true){
-                    Text(
-                        text = "Searched Item",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 20.dp)
-                    )
+                when {
+                    text.isEmpty() -> {
+                        // Kosongkan UI jika user tidak mencari apa-apa
+                    }
+                    filteredVotes.isNotEmpty() -> {
+                        Text(
+                            text = "Searched Item",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 20.dp)
+                        )
+                    }
+                    else -> {
+                        if (isSearchAppear) {
+                            Text(
+                                text = "Vote tidak dijumpai",
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier.padding(start = 20.dp, top = 10.dp)
+                            )
+                        }
+                    }
                 }
             }
+
             items(filteredVotes) { vote ->
                 val title = vote["title"] as? String ?: "Tidak Ada Judul"
                 val unicId = vote["unicID"] as? String ?: "Tidak Ada ID"

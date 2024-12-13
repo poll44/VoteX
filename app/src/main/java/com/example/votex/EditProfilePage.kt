@@ -73,7 +73,6 @@ fun EditProfilePage(navController: NavController) {
                         userName = it.name ?: ""
                         birthDate = it.birthDate ?: ""
                         city = it.place ?: ""
-                        password = it.password
                     }
                 }
             }
@@ -167,26 +166,6 @@ fun EditProfilePage(navController: NavController) {
                         .padding(horizontal = 20.dp, vertical = 5.dp),
                     value = stringEmail,
                     enabled = false,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF008753),
-                        unfocusedBorderColor = Color.Gray,
-                        cursorColor = Color(0xFF008753),
-                    ),
-                    onValueChange = { }
-                )
-                Text(
-                    text = "Password",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .padding(horizontal = 20.dp, vertical = 5.dp),
-                    value = password,
-                    enabled = false,
-                    visualTransformation = PasswordVisualTransformation(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFF008753),
                         unfocusedBorderColor = Color.Gray,

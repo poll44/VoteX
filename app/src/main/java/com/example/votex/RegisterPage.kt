@@ -82,7 +82,6 @@ fun RegisterPage(navController: NavController) {
                         profilePhoto = "",
                         name = "",
                         email = email,
-                        password = password,
                         birthDate = "",
                         place = "",
                         hasVotedAt = emptyList()
@@ -152,7 +151,6 @@ fun RegisterPage(navController: NavController) {
                                         profilePhoto = "",
                                         name = user.displayName ?: "",
                                         email = user.email ?: "",
-                                        password = "",
                                         birthDate = "",
                                         place = "",
                                         hasVotedAt = emptyList()
